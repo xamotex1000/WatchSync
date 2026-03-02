@@ -690,7 +690,7 @@
       <button class="color-btn blue"   title="Blue"   onclick="colorPress('blue')"></button>
     </div>
     <button class="dr-don-btn" id="dr-don-btn" onclick="drDonButton()">
-      <img src="Don.png"></img>
+      <img src="Images/Don.png">
     </button>
     <div class="status-pill" id="status-pill">
       <div class="status-dot"></div>
@@ -881,12 +881,12 @@ async function fetchDrDonPlaylist() {
     if (drDonPlaylist.length === 0) throw new Error('no entries parsed');
 
     btn.disabled = false;
-    btn.innerHTML = '🎬 Dr. Don Button';
+    btn.innerHTML = '<img src="Images/Don.png">';
     log('system', `Dr. Don playlist loaded — ${drDonPlaylist.length} videos`);
   } catch (err) {
     drDonPlaylist = [];
     btn.disabled = false;
-    btn.innerHTML = '🎬 Dr. Don Button';
+    btn.innerHTML = '<img src="Images/Don.png">';
     log('error', 'Playlist load failed: ' + err.message);
   }
 }
@@ -919,7 +919,7 @@ async function drDonButton() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '🎬 Dr. Don Button';
+  btn.innerHTML = '<img src="Images/Don.png">';
 }
 
 /* ── Queue ───────────────────────────────────────────────────────────────── */
