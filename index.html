@@ -1292,6 +1292,9 @@ function becomeHost(firstGuestConn) {
   welcomeGuest(firstGuestConn);
 }
 
+const doobeep = new Audio("audio/DooBeep.wav");
+const beedoop = new Audio("audio/BeeDoop.wav");
+
 function welcomeGuest(c) {
   c.on('open', () => {
     guestConns.set(c.peer, c);
@@ -1314,6 +1317,11 @@ function welcomeGuest(c) {
       playing:  ytReady && ytPlayer.getPlayerState() === 1,
       usernameMap
     });
+
+    doobeep.currentTime = 0;
+    doobeep.play()
+      .catch(err => console.log('Audio play failed:', err));
+
     // Tell the new guest our username
     if (myUsername) {
       c.send({ type: 'username_update', peerId: myId, username: myUsername });
@@ -1335,6 +1343,9 @@ function welcomeGuest(c) {
     broadcastAll({ type: 'peer_left', peerId: c.peer });
     log('error', getDisplayName(c.peer) + ' left the party');
     if (guestConns.size === 0) updateStatusSolo();
+    beedoop.currentTime = 0;
+    beedoop.play()
+      .catch(err => console.log('Audio play failed:', err));
   });
 
   c.on('error', err => log('error', err.message));
@@ -1384,6 +1395,10 @@ function handleWelcome(msg) {
     });
   }
 
+  doobeep.currentTime = 0;
+  doobeep.play()
+    .catch(err => console.log('Audio play failed:', err));
+  
   renderQueue(); updateQueueCount();
   showPartyBanner('GUEST');
   openPlayerSection();
