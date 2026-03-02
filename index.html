@@ -1341,6 +1341,7 @@ function welcomeGuest(c) {
       usernameMap
     });
 
+    doobeep.volume = 0.2;
     doobeep.currentTime = 0;
     doobeep.play()
       .catch(err => console.log('Audio play failed:', err));
@@ -1366,6 +1367,7 @@ function welcomeGuest(c) {
     broadcastAll({ type: 'peer_left', peerId: c.peer });
     log('error', getDisplayName(c.peer) + ' left the party');
     if (guestConns.size === 0) updateStatusSolo();
+    beedoop.volume = 0.2;
     beedoop.currentTime = 0;
     beedoop.play()
       .catch(err => console.log('Audio play failed:', err));
@@ -1401,6 +1403,7 @@ function wireAsGuest(c) {
     document.getElementById('disconnect-banner').classList.add('visible');
     document.getElementById('disconnect-banner').textContent = '⚠ Host disconnected. Reload to start a new session.';
     log('error', 'Host disconnected');
+    doobeep.volume = 0.2;
     banono.currentTime = 0;
     banono.play()
       .catch(err => console.log('Audio play failed:', err));
@@ -1424,6 +1427,7 @@ function handleWelcome(msg) {
     });
   }
 
+  doobeep.volume = 0.2;
   doobeep.currentTime = 0;
   doobeep.play()
     .catch(err => console.log('Audio play failed:', err));
