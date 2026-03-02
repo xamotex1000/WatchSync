@@ -562,7 +562,7 @@ function tryInitPeer () {
 function initPeer () {
   const code = mkCode();
   console.log(code);
-  peer = new Peer({ 
+  peer = new Peer(code, { 
     host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 2,
     config: {
       iceServers: [
@@ -571,9 +571,7 @@ function initPeer () {
       ]
     }
   });
-  console.log("new Peer Done");
   peer.on('open', function(id) {
-    console.log("peer Opening" + id);
     myId = id;
     document.getElementById('my-peer-id').textContent = id;
     document.getElementById('connect-btn').disabled = false;
@@ -585,7 +583,6 @@ function initPeer () {
   peer.on('connection', c => {
     wire(c);
     log('peer', 'Incoming connection…');
-    console.log("peer Connection Done");
   });
   
 
