@@ -403,6 +403,103 @@
   .btn-primary:hover { background: #f5ff70; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(232,255,71,0.3); }
   .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
 
+  /* ── Username Panel ── */
+  .username-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .username-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), transparent);
+  }
+
+  .username-panel .panel-label { margin-bottom: 0; flex-shrink: 0; }
+
+  .username-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  #username-input {
+    flex: 1;
+    max-width: 240px;
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .username-set-btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid rgba(71,255,138,0.3);
+    background: rgba(71,255,138,0.07);
+    color: var(--green);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .username-set-btn:hover {
+    background: rgba(71,255,138,0.14);
+    border-color: var(--green);
+    box-shadow: 0 0 12px rgba(71,255,138,0.2);
+  }
+
+  .username-confirm {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+
+  .username-confirm.show { opacity: 1; }
+
+  .username-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .username-preview-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .username-preview-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: rgba(232,255,71,0.1);
+    border: 1px solid rgba(232,255,71,0.25);
+    color: var(--accent);
+    transition: all 0.3s;
+  }
+
   #player-section { display: none; }
   #player-section.visible { display: block; }
 
@@ -814,6 +911,12 @@
     color: var(--green);
   }
 
+  /* ── Peer chip with tooltip ── */
+  .peer-chip[title] {
+    position: relative;
+    cursor: default;
+  }
+
   @media (max-width: 640px) {
     #lobby-panel { grid-template-columns: 1fr; }
     .peer-id-display { font-size: 32px; letter-spacing: 3px; }
@@ -826,6 +929,9 @@
     .queue-thumb { width: 60px; height: 34px; }
     .color-btn { width: 22px; height: 22px; }
     .dr-don-btn { font-size: 9px; padding: 5px 10px; }
+    .username-panel { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .username-input-wrap { flex-direction: column; align-items: flex-start; width: 100%; }
+    #username-input { max-width: 100%; }
   }
 </style>
 </head>
@@ -859,6 +965,20 @@
 <main>
   <div id="disconnect-banner" class="disconnect-banner">
     ⚠ Host disconnected. Reload the page to start a new session.
+  </div>
+
+  <!-- USERNAME PANEL -->
+  <div class="username-panel" id="username-panel">
+    <div class="panel-label">// Your name</div>
+    <div class="username-input-wrap">
+      <input type="text" id="username-input" placeholder="Enter a display name…" maxlength="20" />
+      <button class="username-set-btn" onclick="setUsername()">SET NAME</button>
+      <span class="username-confirm" id="username-confirm">✓ name updated</span>
+    </div>
+    <div class="username-preview">
+      <span class="username-preview-label">Showing as</span>
+      <span class="username-preview-chip" id="username-preview-chip">···</span>
+    </div>
   </div>
 
   <!-- LOBBY: shown until party is formed -->
@@ -964,6 +1084,52 @@
      3. Joiner is now in the party.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Username ────────────────────────────────────────────────────────────── */
+let myUsername = null;
+
+// Restore from localStorage if available
+(function () {
+  try {
+    const saved = localStorage.getItem('watchsync_username');
+    if (saved) {
+      myUsername = saved;
+      document.getElementById('username-input').value = saved;
+      document.getElementById('username-preview-chip').textContent = saved;
+    }
+  } catch (e) {}
+})();
+
+function setUsername() {
+  const raw = document.getElementById('username-input').value.trim();
+  if (!raw) return;
+  const name = raw.substring(0, 20);
+  myUsername = name;
+  document.getElementById('username-preview-chip').textContent = name;
+  try { localStorage.setItem('watchsync_username', name); } catch (e) {}
+
+  // Show confirm flash
+  const conf = document.getElementById('username-confirm');
+  conf.classList.add('show');
+  setTimeout(() => conf.classList.remove('show'), 2000);
+
+  // If we're already in a party, broadcast the name change
+  broadcastAll({ type: 'username_update', peerId: myId, username: name });
+
+  // Update chips immediately
+  updatePeerChips();
+
+  log('system', 'Display name set: ' + name);
+}
+
+// Map of peerId → username for all known peers
+const peerUsernames = new Map();
+
+function getDisplayName(peerId) {
+  if (!peerId) return '???';
+  const name = peerUsernames.get(peerId);
+  return name || peerId.substring(0, 6);
+}
+
 /* ── YouTube IFrame API ──────────────────────────────────────────────────── */
 let ytPlayer = null, ytReady = false, pendingVideoId = null, pendingSeek = null, isSyncing = false;
 
@@ -1049,6 +1215,10 @@ function initPeer() {
   peer.on('open', id => {
     myId = id;
     myNickname = id.substring(0, 6);
+    // Set default preview chip if no username yet
+    if (!myUsername) {
+      document.getElementById('username-preview-chip').textContent = myNickname;
+    }
     document.getElementById('my-peer-id').textContent = id.substring(0,3) + '-' + id.substring(3,6);
     document.getElementById('connect-btn').disabled = false;
     document.getElementById('status-text').textContent = 'ready';
@@ -1108,9 +1278,13 @@ function welcomeGuest(c) {
     guestConns.set(c.peer, c);
     updateStatusConnected();
     updatePeerChips();
-    log('peer', '+ ' + c.peer.substring(0,6) + ' joined the party');
+    log('peer', '+ ' + getDisplayName(c.peer) + ' joined the party');
 
-    // Send full state to new guest
+    // Send full state to new guest (including all known usernames)
+    const usernameMap = {};
+    peerUsernames.forEach((name, id) => { usernameMap[id] = name; });
+    if (myUsername) usernameMap[myId] = myUsername;
+
     c.send({
       type: 'welcome',
       partyCode,
@@ -1118,8 +1292,13 @@ function welcomeGuest(c) {
       currentIndex,
       videoId:  getVideoId(),
       time:     ytReady ? ytPlayer.getCurrentTime() : 0,
-      playing:  ytReady && ytPlayer.getPlayerState() === 1
+      playing:  ytReady && ytPlayer.getPlayerState() === 1,
+      usernameMap
     });
+    // Tell the new guest our username
+    if (myUsername) {
+      c.send({ type: 'username_update', peerId: myId, username: myUsername });
+    }
     // Also tell everyone a new person joined
     broadcastAll({ type: 'peer_joined', peerId: c.peer }, c.peer);
   });
@@ -1132,9 +1311,10 @@ function welcomeGuest(c) {
 
   c.on('close', () => {
     guestConns.delete(c.peer);
+    peerUsernames.delete(c.peer);
     updatePeerChips();
     broadcastAll({ type: 'peer_left', peerId: c.peer });
-    log('error', c.peer.substring(0,6) + ' left the party');
+    log('error', getDisplayName(c.peer) + ' left the party');
     if (guestConns.size === 0) updateStatusSolo();
   });
 
@@ -1146,6 +1326,10 @@ function wireAsGuest(c) {
   hostConn = c;
   c.on('open', () => {
     log('peer', 'Connected to host…');
+    // Introduce ourselves with our username
+    if (myUsername) {
+      c.send({ type: 'username_update', peerId: myId, username: myUsername });
+    }
   });
 
   c.on('data', msg => {
@@ -1173,6 +1357,14 @@ function handleWelcome(msg) {
   isHost = false;
   queue = msg.queue || [];
   currentIndex = msg.currentIndex != null ? msg.currentIndex : -1;
+
+  // Load username map sent from host
+  if (msg.usernameMap) {
+    Object.entries(msg.usernameMap).forEach(([id, name]) => {
+      if (id !== myId) peerUsernames.set(id, name);
+    });
+  }
+
   renderQueue(); updateQueueCount();
   showPartyBanner('GUEST');
   openPlayerSection();
@@ -1210,21 +1402,28 @@ function handleMessage(msg, fromId) {
   isSyncing = true;
   try {
     switch (msg.type) {
+      case 'username_update':
+        if (msg.peerId && msg.username) {
+          peerUsernames.set(msg.peerId, msg.username);
+          updatePeerChips();
+          log('peer', getDisplayName(msg.peerId) + ' set their name to "' + msg.username + '"');
+        }
+        break;
       case 'load':
         applyLoad(msg.videoId, msg.time);
-        log('peer', (fromId||'?').substring(0,6) + ' loaded · ' + msg.videoId);
+        log('peer', getDisplayName(fromId) + ' loaded · ' + msg.videoId);
         break;
       case 'queue_add':
         queueAdd(msg.videoId, msg.title, msg.thumb);
-        log('peer', (fromId||'?').substring(0,6) + ' queued: ' + (msg.title || msg.videoId));
+        log('peer', getDisplayName(fromId) + ' queued: ' + (msg.title || msg.videoId));
         break;
       case 'queue_play':
         queuePlayAt(msg.idx);
-        log('peer', (fromId||'?').substring(0,6) + ' skipped to track ' + (msg.idx + 1));
+        log('peer', getDisplayName(fromId) + ' skipped to track ' + (msg.idx + 1));
         break;
       case 'queue_remove':
         queueRemove(msg.idx);
-        log('peer', (fromId||'?').substring(0,6) + ' removed track ' + (msg.idx + 1));
+        log('peer', getDisplayName(fromId) + ' removed track ' + (msg.idx + 1));
         break;
       case 'queue_sync':
         queue = msg.queue; currentIndex = msg.currentIndex;
@@ -1233,18 +1432,17 @@ function handleMessage(msg, fromId) {
       case 'play':
         if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); }
         document.getElementById('play-btn').textContent = '⏸';
-        log('peer', (fromId||'?').substring(0,6) + ' played at ' + fmt(msg.time));
+        log('peer', getDisplayName(fromId) + ' played at ' + fmt(msg.time));
         break;
       case 'pause':
         if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); }
         document.getElementById('play-btn').textContent = '▶';
-        log('peer', (fromId||'?').substring(0,6) + ' paused at ' + fmt(msg.time));
+        log('peer', getDisplayName(fromId) + ' paused at ' + fmt(msg.time));
         break;
       case 'sync_req':
         if (ytReady) {
           const res = { type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1, sentAt: msg.sentAt };
           if (isHost) {
-            // Send directly back to requester
             const rc = guestConns.get(fromId);
             if (rc && rc.open) rc.send(res);
           } else {
@@ -1266,11 +1464,12 @@ function handleMessage(msg, fromId) {
         break;
       case 'peer_joined':
         updatePeerChips();
-        log('peer', '+ ' + (msg.peerId||'').substring(0,6) + ' joined');
+        log('peer', '+ ' + getDisplayName(msg.peerId) + ' joined');
         break;
       case 'peer_left':
+        peerUsernames.delete(msg.peerId);
         updatePeerChips();
-        log('error', (msg.peerId||'').substring(0,6) + ' left');
+        log('error', getDisplayName(msg.peerId) + ' left');
         break;
     }
   } finally {
@@ -1299,10 +1498,12 @@ function updatePeerChips() {
   list.innerHTML = '';
   let count = 1; // self
 
-  // Self chip
+  // Self chip — show username if set, else fallback to short peer ID
+  const selfLabel = myUsername || (myId ? myId.substring(0, 6) : 'YOU');
   const self = document.createElement('div');
   self.className = 'peer-chip me';
-  self.textContent = myId ? myId.substring(0,6) : 'YOU';
+  self.textContent = selfLabel;
+  self.title = myId ? myId.substring(0,6) : '';
   list.appendChild(self);
 
   if (isHost) {
@@ -1310,15 +1511,18 @@ function updatePeerChips() {
       count++;
       const chip = document.createElement('div');
       chip.className = 'peer-chip';
-      chip.textContent = id.substring(0,6);
+      const name = peerUsernames.get(id) || id.substring(0, 6);
+      chip.textContent = name;
+      chip.title = id.substring(0, 6);
       list.appendChild(chip);
     });
   } else if (hostConn) {
-    // We know there's at least the host + us; we can't enumerate others
     count = 2; // minimum: us + host
     const chip = document.createElement('div');
     chip.className = 'peer-chip';
-    chip.textContent = partyCode ? partyCode.substring(0,6) : 'HOST';
+    const hostName = (partyCode && peerUsernames.get(partyCode)) || (partyCode ? partyCode.substring(0, 6) : 'HOST');
+    chip.textContent = hostName;
+    chip.title = partyCode ? partyCode.substring(0, 6) : '';
     list.appendChild(chip);
   }
 
@@ -1613,6 +1817,7 @@ async function drDonButton() {
 document.getElementById('connect-input').addEventListener('keydown', e => { if (e.key === 'Enter') connectToPeer(); });
 document.getElementById('connect-input').addEventListener('input',   e => { e.target.value = e.target.value.toUpperCase(); });
 document.getElementById('video-url').addEventListener('keydown',     e => { if (e.key === 'Enter') submitVideo(); });
+document.getElementById('username-input').addEventListener('keydown', e => { if (e.key === 'Enter') setUsername(); });
 
 /* ── Boot ────────────────────────────────────────────────────────────────── */
 const yt = document.createElement('script');
