@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WatchSync — Synchronized Cinema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #e8ff47;
+    --accent2: #ff4757;
+    --text: #f0f0f0;
+    --muted: #666;
+    --green: #47ff8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  header {
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(232,255,71,0.3);
+  }
+
+  .logo span { color: var(--text); }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+
+  .status-pill.connected { border-color: var(--green); color: var(--green); }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: all 0.3s;
+  }
+
+  .status-pill.connected .status-dot {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
+
+  #connect-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .panel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .peer-id-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 6px;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(232,255,71,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: all;
+    word-break: break-all;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .peer-id-display:hover { text-shadow: 0 0 30px rgba(232,255,71,0.5); }
+
+  .peer-id-hint {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .peer-id-hint.copied { color: var(--green); }
+
+  .connect-form { display: flex; flex-direction: column; gap: 12px; }
+
+  input[type="text"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 1px;
+    width: 100%;
+  }
+
+  input[type="text"]::placeholder { color: var(--muted); letter-spacing: 0; }
+  input[type="text"]:focus { border-color: var(--accent); }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .btn-primary { background: var(--accent); color: #0a0a0a; font-weight: 500; }
+  .btn-primary:hover { background: #f5ff70; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(232,255,71,0.3); }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
+  #player-section { display: none; }
+  #player-section.visible { display: block; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+  }
+
+  .video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  #youtube-player {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .player-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--muted);
+  }
+
+  .placeholder-icon { font-size: 64px; opacity: 0.2; }
+  .placeholder-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.4;
+  }
+
+  .url-submit-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .url-submit-row input { flex: 1; }
+
+  .controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+
+  .ctrl-btn {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.15s;
+  }
+
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,0.05); }
+
+  .time-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .sync-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    padding: 4px 10px;
+    background: rgba(71,255,138,0.08);
+    border: 1px solid rgba(71,255,138,0.2);
+    border-radius: 100px;
+  }
+
+  .sync-indicator.syncing {
+    color: var(--accent);
+    background: rgba(232,255,71,0.08);
+    border-color: rgba(232,255,71,0.2);
+  }
+
+  .activity-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .activity-panel .panel-label { margin-bottom: 12px; }
+
+  .activity-log {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .log-entry {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+  }
+
+  .log-time { color: var(--border); flex-shrink: 0; }
+  .log-entry.system { color: var(--accent); }
+  .log-entry.peer { color: var(--green); }
+  .log-entry.error { color: var(--accent2); }
+
+  #init-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 500;
+    transition: opacity 0.5s;
+  }
+
+  #init-overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .init-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    letter-spacing: 8px;
+    color: var(--accent);
+    text-shadow: 0 0 60px rgba(232,255,71,0.4);
+    animation: flicker 3s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.8; }
+    94% { opacity: 1; }
+    96% { opacity: 0.9; }
+    97% { opacity: 1; }
+  }
+
+  .init-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .init-spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .disconnect-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    margin-bottom: 16px;
+  }
+
+  .disconnect-banner.visible { display: flex; }
+
+  @media (max-width: 640px) {
+    #connect-panel { grid-template-columns: 1fr; }
+    .peer-id-display { font-size: 32px; letter-spacing: 3px; }
+    main { padding: 24px 16px; }
+    header { padding: 16px; }
+    .url-submit-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div id="init-overlay">
+  <div class="init-logo">WATCH<span style="color:var(--text)">SYNC</span></div>
+  <div class="init-sub">Initializing peer connection</div>
+  <div class="init-spinner"></div>
+</div>
+
+<header>
+  <div class="logo">WATCH<span>SYNC</span></div>
+  <div class="status-pill" id="status-pill">
+    <div class="status-dot"></div>
+    <span id="status-text">connecting...</span>
+  </div>
+</header>
+
+<main>
+  <div id="disconnect-banner" class="disconnect-banner">
+    ⚠ Peer disconnected. Reload the page to start a new session.
+  </div>
+
+  <div id="connect-panel">
+    <div class="panel">
+      <div class="panel-label">// Your connection code</div>
+      <div class="peer-id-display" id="my-peer-id" onclick="copyId()" title="Click to copy">·····</div>
+      <div class="peer-id-hint" id="copy-hint">click to copy</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">// Connect to friend</div>
+      <div class="connect-form">
+        <input type="text" id="connect-input" placeholder="Enter their code..." maxlength="20" />
+        <button class="btn btn-primary" id="connect-btn" onclick="connectToPeer()" disabled>
+          CONNECT →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="player-section">
+    <div class="section-header">
+      <div class="section-title">NOW PLAYING</div>
+      <div class="sync-indicator" id="sync-indicator">● IN SYNC</div>
+    </div>
+
+    <div class="video-container">
+      <div class="player-placeholder" id="player-placeholder">
+        <div class="placeholder-icon">▶</div>
+        <div class="placeholder-text">Submit a YouTube link below</div>
+      </div>
+      <div id="youtube-player"></div>
+    </div>
+
+    <div class="url-submit-row">
+      <input type="text" id="video-url" placeholder="https://youtube.com/watch?v=... or paste a video ID" />
+      <button class="btn btn-primary" onclick="submitVideo()">LOAD VIDEO</button>
+    </div>
+
+    <div class="controls-bar">
+      <button class="ctrl-btn" id="play-btn" onclick="togglePlay()" title="Play / Pause">▶</button>
+      <button class="ctrl-btn" onclick="syncNow()" title="Request sync from peer" style="font-size:14px;letter-spacing:-1px">SYNC</button>
+      <div class="time-display" id="time-display">0:00 / 0:00</div>
+    </div>
+
+    <div class="activity-panel">
+      <div class="panel-label">// Activity log</div>
+      <div class="activity-log" id="activity-log"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ── YouTube IFrame API ──────────────────────────────────────────────────── */
+let ytPlayer = null;
+let ytReady  = false;
+let pendingVideoId = null;
+let pendingSeek    = null;
+let isSyncing = false; // guard to avoid echoing remote events back
+
+window.onYouTubeIframeAPIReady = function () {
+  ytPlayer = new YT.Player('youtube-player', {
+    height: '100%', width: '100%',
+    videoId: '',
+    playerVars: { autoplay: 0, controls: 1, modestbranding: 1, rel: 0, playsinline: 1 },
+    events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange }
+  });
+};
+
+function onPlayerReady () {
+  ytReady = true;
+  if (pendingVideoId) {
+    document.getElementById('player-placeholder').style.display = 'none';
+    ytPlayer.loadVideoById({ videoId: pendingVideoId, startSeconds: pendingSeek || 0 });
+    pendingVideoId = null; pendingSeek = null;
+  }
+  setInterval(updateTimeDisplay, 500);
+}
+
+let lastEventMs = 0;
+function onPlayerStateChange (e) {
+  if (isSyncing) return;
+  const now = Date.now();
+  if (now - lastEventMs < 250) return;
+  lastEventMs = now;
+
+  if (e.data === 1) { // PLAYING
+    document.getElementById('play-btn').textContent = '⏸';
+    broadcast({ type: 'play', time: ytPlayer.getCurrentTime() });
+    log('system', 'You played at ' + fmt(ytPlayer.getCurrentTime()));
+  } else if (e.data === 2) { // PAUSED
+    document.getElementById('play-btn').textContent = '▶';
+    broadcast({ type: 'pause', time: ytPlayer.getCurrentTime() });
+    log('system', 'You paused at ' + fmt(ytPlayer.getCurrentTime()));
+  }
+}
+
+function updateTimeDisplay () {
+  if (!ytPlayer || !ytPlayer.getDuration) return;
+  const c = ytPlayer.getCurrentTime() || 0;
+  const d = ytPlayer.getDuration()    || 0;
+  document.getElementById('time-display').textContent = fmt(c) + ' / ' + fmt(d);
+}
+
+function fmt (s) {
+  s = Math.floor(s || 0);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+/* ── PeerJS ──────────────────────────────────────────────────────────────── */
+let peer = null, conn = null, myId = null;
+
+function mkCode () {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 3 }, () => chars[Math.random() * chars.length | 0]).join('') +
+    '-' +
+    Array.from({ length: 3 }, () => chars[Math.random() * chars.length | 0]).join('');
+}
+
+function initPeer () {
+  const code = mkCode();
+  peer = new Peer(code, {
+    host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 0,
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:global.stun.twilio.com:3478' }
+      ]
+    }
+  });
+
+  peer.on('open', id => {
+    myId = id;
+    document.getElementById('my-peer-id').textContent = id;
+    document.getElementById('connect-btn').disabled = false;
+    document.getElementById('status-text').textContent = 'ready';
+    setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
+    log('system', 'Your code: ' + id);
+  });
+
+  peer.on('connection', c => {
+    wire(c);
+    log('peer', 'Incoming connection…');
+  });
+
+  peer.on('error', err => {
+    if (err.type === 'unavailable-id') { peer.destroy(); initPeer(); return; }
+    log('error', 'Error: ' + err.message);
+    setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 800);
+  });
+
+  peer.on('disconnected', () => { peer.reconnect(); });
+}
+
+function connectToPeer () {
+  const code = document.getElementById('connect-input').value.trim().toUpperCase();
+  if (!code || !peer) return;
+  log('system', 'Dialing ' + code + '…');
+  wire(peer.connect(code, { reliable: true }));
+}
+
+function wire (c) {
+  conn = c;
+  c.on('open', () => {
+    document.getElementById('status-pill').classList.add('connected');
+    document.getElementById('status-text').textContent = 'connected · ' + c.peer;
+    document.getElementById('player-section').classList.add('visible');
+    log('peer', 'Connected to ' + c.peer);
+  });
+  c.on('data',  handle);
+  c.on('close', () => {
+    document.getElementById('status-pill').classList.remove('connected');
+    document.getElementById('status-text').textContent = 'disconnected';
+    document.getElementById('disconnect-banner').classList.add('visible');
+    log('error', 'Peer disconnected');
+    conn = null;
+  });
+  c.on('error', err => log('error', err.message));
+}
+
+function broadcast (msg) {
+  if (conn && conn.open) conn.send(msg);
+}
+
+/* ── Message Handler ─────────────────────────────────────────────────────── */
+function handle (msg) {
+  isSyncing = true;
+  try {
+    switch (msg.type) {
+      case 'load':
+        applyLoad(msg.videoId, msg.time);
+        log('peer', 'Friend loaded video · ' + msg.videoId);
+        break;
+      case 'play':
+        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); }
+        document.getElementById('play-btn').textContent = '⏸';
+        log('peer', 'Friend played at ' + fmt(msg.time));
+        break;
+      case 'pause':
+        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); }
+        document.getElementById('play-btn').textContent = '▶';
+        log('peer', 'Friend paused at ' + fmt(msg.time));
+        break;
+      case 'sync_req':
+        if (ytReady) {
+          broadcast({
+            type: 'sync_res',
+            videoId: getVideoId(),
+            time: ytPlayer.getCurrentTime(),
+            playing: ytPlayer.getPlayerState() === 1
+          });
+        }
+        break;
+      case 'sync_res':
+        if (msg.videoId) applyLoad(msg.videoId, msg.time);
+        if (msg.playing && ytReady) ytPlayer.playVideo();
+        log('peer', 'Synced · ' + fmt(msg.time));
+        setSyncLabel('SYNCED ✓', false);
+        break;
+    }
+  } finally {
+    setTimeout(() => { isSyncing = false; }, 400);
+  }
+}
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+function submitVideo () {
+  const raw = document.getElementById('video-url').value.trim();
+  const id  = extractId(raw);
+  if (!id) { log('error', 'Could not parse YouTube URL'); return; }
+  applyLoad(id, 0);
+  broadcast({ type: 'load', videoId: id, time: 0 });
+  log('system', 'Loaded video · ' + id);
+  document.getElementById('video-url').value = '';
+}
+
+function applyLoad (videoId, startTime) {
+  document.getElementById('player-placeholder').style.display = 'none';
+  if (ytReady) {
+    ytPlayer.loadVideoById({ videoId, startSeconds: startTime || 0 });
+  } else {
+    pendingVideoId = videoId; pendingSeek = startTime;
+  }
+}
+
+function togglePlay () {
+  if (!ytPlayer || !ytReady) return;
+  ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+}
+
+function syncNow () {
+  if (!conn || !conn.open) { log('error', 'Not connected'); return; }
+  broadcast({ type: 'sync_req' });
+  setSyncLabel('SYNCING…', true);
+  log('system', 'Sync request sent');
+}
+
+function setSyncLabel (text, syncing) {
+  const el = document.getElementById('sync-indicator');
+  el.textContent = (syncing ? '⟳ ' : '● ') + text;
+  el.classList.toggle('syncing', syncing);
+  if (syncing) setTimeout(() => setSyncLabel('IN SYNC', false), 3000);
+}
+
+function getVideoId () {
+  try { return extractId(ytPlayer.getVideoUrl()); } catch { return null; }
+}
+
+function extractId (url) {
+  if (!url) return null;
+  for (const re of [/[?&]v=([^&#]+)/, /youtu\.be\/([^?&#]+)/, /embed\/([^?&#]+)/, /shorts\/([^?&#]+)/]) {
+    const m = url.match(re);
+    if (m) return m[1];
+  }
+  return /^[a-zA-Z0-9_-]{11}$/.test(url) ? url : null;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────────────── */
+function copyId () {
+  if (!myId) return;
+  navigator.clipboard.writeText(myId).then(() => {
+    const h = document.getElementById('copy-hint');
+    h.textContent = 'copied!'; h.classList.add('copied');
+    setTimeout(() => { h.textContent = 'click to copy'; h.classList.remove('copied'); }, 2000);
+  });
+}
+
+function log (type, msg) {
+  const box  = document.getElementById('activity-log');
+  const now  = new Date();
+  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2,'0')).join(':');
+  const row  = document.createElement('div');
+  row.className = 'log-entry ' + type;
+  row.innerHTML = `<span class="log-time">${time}</span><span>${msg}</span>`;
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+  while (box.children.length > 120) box.removeChild(box.firstChild);
+}
+
+/* ── Listeners ───────────────────────────────────────────────────────────── */
+document.getElementById('connect-input').addEventListener('keydown', e => { if (e.key === 'Enter') connectToPeer(); });
+document.getElementById('connect-input').addEventListener('input',   e => { e.target.value = e.target.value.toUpperCase(); });
+document.getElementById('video-url').addEventListener('keydown',     e => { if (e.key === 'Enter') submitVideo(); });
+
+/* ── Boot ────────────────────────────────────────────────────────────────── */
+const yt = document.createElement('script');
+yt.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(yt);
+
+initPeer();
+</script>
+</body>
+</html>
