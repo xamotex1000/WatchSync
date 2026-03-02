@@ -309,6 +309,191 @@
     border-color: rgba(232,255,71,0.2);
   }
 
+  /* ── QUEUE ── */
+  .queue-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .queue-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .queue-header .panel-label { margin-bottom: 0; }
+
+  .queue-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 2px 10px;
+  }
+
+  .queue-empty {
+    padding: 28px 20px;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .queue-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .queue-item:last-child { border-bottom: none; }
+
+  .queue-item:hover { background: var(--surface2); }
+
+  .queue-item.active {
+    background: rgba(232,255,71,0.04);
+    border-left: 2px solid var(--accent);
+  }
+
+  .queue-item.active:hover { background: rgba(232,255,71,0.07); }
+
+  .queue-index {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .queue-item.active .queue-index {
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+  .queue-thumb {
+    width: 80px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--surface2);
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .queue-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+    display: block;
+  }
+
+  .queue-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    opacity: 0.2;
+    background: var(--surface2);
+  }
+
+  .queue-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .queue-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .queue-item.active .queue-title { color: var(--accent); }
+
+  .queue-vid-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .queue-playing-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(232,255,71,0.12);
+    border: 1px solid rgba(232,255,71,0.25);
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .queue-delete-btn {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    opacity: 0;
+  }
+
+  .queue-item:hover .queue-delete-btn { opacity: 1; }
+
+  .queue-delete-btn:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(255,71,87,0.08);
+  }
+
+  /* ── ACTIVITY ── */
   .activity-panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -417,6 +602,7 @@
     main { padding: 24px 16px; }
     header { padding: 16px; }
     .url-submit-row { flex-direction: column; }
+    .queue-thumb { width: 60px; height: 34px; }
   }
 </style>
 </head>
@@ -475,13 +661,24 @@
 
     <div class="url-submit-row">
       <input type="text" id="video-url" placeholder="https://youtube.com/watch?v=... or paste a video ID" />
-      <button class="btn btn-primary" onclick="submitVideo()">LOAD VIDEO</button>
+      <button class="btn btn-primary" onclick="submitVideo()">ADD TO QUEUE</button>
     </div>
 
     <div class="controls-bar">
       <button class="ctrl-btn" id="play-btn" onclick="togglePlay()" title="Play / Pause">▶</button>
       <button class="ctrl-btn" onclick="syncNow()" title="Request sync from peer" style="font-size:14px;letter-spacing:-1px">SYNC</button>
       <div class="time-display" id="time-display">0:00 / 0:00</div>
+    </div>
+
+    <!-- Queue -->
+    <div class="queue-section">
+      <div class="queue-header">
+        <div class="panel-label" style="margin-bottom:0">// Queue</div>
+        <div class="queue-count" id="queue-count">0 videos</div>
+      </div>
+      <div id="queue-list" class="queue-list">
+        <div class="queue-empty" id="queue-empty">No videos in queue</div>
+      </div>
     </div>
 
     <div class="activity-panel">
@@ -497,7 +694,7 @@ let ytPlayer = null;
 let ytReady  = false;
 let pendingVideoId = null;
 let pendingSeek    = null;
-let isSyncing = false; // guard to avoid echoing remote events back
+let isSyncing = false;
 
 window.onYouTubeIframeAPIReady = function () {
   ytPlayer = new YT.Player('youtube-player', {
@@ -533,6 +730,8 @@ function onPlayerStateChange (e) {
     document.getElementById('play-btn').textContent = '▶';
     broadcast({ type: 'pause', time: ytPlayer.getCurrentTime() });
     log('system', 'You paused at ' + fmt(ytPlayer.getCurrentTime()));
+  } else if (e.data === 0) { // ENDED — auto-advance queue
+    advanceQueue();
   }
 }
 
@@ -548,6 +747,148 @@ function fmt (s) {
   return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
 }
 
+/* ── Queue ───────────────────────────────────────────────────────────────── */
+// Each item: { videoId, title, thumb }
+let queue = [];
+let currentIndex = -1; // index of currently playing video
+
+function queueAdd (videoId, title, thumb) {
+  queue.push({ videoId, title: title || videoId, thumb: thumb || null });
+  renderQueue();
+  updateQueueCount();
+}
+
+function queueRemove (idx) {
+  if (idx === currentIndex) return; // don't remove currently playing
+  queue.splice(idx, 1);
+  if (currentIndex > idx) currentIndex--;
+  renderQueue();
+  updateQueueCount();
+}
+
+function queuePlayAt (idx) {
+  currentIndex = idx;
+  const item = queue[idx];
+  applyLoad(item.videoId, 0);
+  broadcast({ type: 'load', videoId: item.videoId, time: 0 });
+  log('system', 'Playing: ' + item.title);
+  renderQueue();
+}
+
+function advanceQueue () {
+  if (currentIndex < queue.length - 1) {
+    queuePlayAt(currentIndex + 1);
+  }
+}
+
+function renderQueue () {
+  const list  = document.getElementById('queue-list');
+  const empty = document.getElementById('queue-empty');
+
+  // Remove all item elements (keep empty placeholder in DOM)
+  [...list.querySelectorAll('.queue-item')].forEach(el => el.remove());
+
+  if (queue.length === 0) {
+    empty.style.display = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  queue.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'queue-item' + (idx === currentIndex ? ' active' : '');
+
+    // Index / now playing indicator
+    const indexEl = document.createElement('div');
+    indexEl.className = 'queue-index';
+    indexEl.textContent = idx === currentIndex ? '▶' : (idx + 1);
+
+    // Thumbnail
+    const thumbEl = document.createElement('div');
+    thumbEl.className = 'queue-thumb';
+    if (item.thumb) {
+      const img = document.createElement('img');
+      img.className = 'queue-thumb-img';
+      img.src = item.thumb;
+      img.alt = '';
+      img.onerror = () => { img.style.display = 'none'; thumbEl.innerHTML += '<div class="queue-thumb-placeholder">▶</div>'; };
+      thumbEl.appendChild(img);
+    } else {
+      thumbEl.innerHTML = '<div class="queue-thumb-placeholder">▶</div>';
+    }
+
+    // Meta
+    const meta = document.createElement('div');
+    meta.className = 'queue-meta';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'queue-title';
+    titleEl.textContent = item.title;
+    const idEl = document.createElement('div');
+    idEl.className = 'queue-vid-id';
+    idEl.textContent = item.videoId;
+    meta.appendChild(titleEl);
+    meta.appendChild(idEl);
+    if (idx === currentIndex) {
+      const badge = document.createElement('div');
+      badge.className = 'queue-playing-badge';
+      badge.textContent = 'Now Playing';
+      meta.appendChild(badge);
+    }
+
+    // Delete btn
+    const del = document.createElement('button');
+    del.className = 'queue-delete-btn';
+    del.title = idx === currentIndex ? 'Currently playing — cannot remove' : 'Remove from queue';
+    del.innerHTML = '🗑';
+    if (idx === currentIndex) {
+      del.style.opacity = '0';
+      del.style.pointerEvents = 'none';
+    }
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      queueRemove(idx);
+      broadcast({ type: 'queue_remove', idx });
+    });
+
+    el.appendChild(indexEl);
+    el.appendChild(thumbEl);
+    el.appendChild(meta);
+    el.appendChild(del);
+
+    // Click to play
+    el.addEventListener('click', () => {
+      queuePlayAt(idx);
+      broadcast({ type: 'queue_play', idx });
+    });
+
+    list.appendChild(el);
+  });
+}
+
+function updateQueueCount () {
+  const el = document.getElementById('queue-count');
+  el.textContent = queue.length + (queue.length === 1 ? ' video' : ' videos');
+}
+
+/* Fetch YouTube title via oEmbed (no API key needed) */
+async function fetchVideoMeta (videoId) {
+  try {
+    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+    if (!res.ok) throw new Error('oembed failed');
+    const data = await res.json();
+    return {
+      title: data.title || videoId,
+      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
+    };
+  } catch {
+    return {
+      title: videoId,
+      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
+    };
+  }
+}
+
 /* ── PeerJS ──────────────────────────────────────────────────────────────── */
 let peer = null, conn = null, myId = null;
 
@@ -555,19 +896,15 @@ function mkCode () {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 6 }, () => chars[Math.random() * chars.length | 0]).join('');
 }
-  
+
 function tryInitPeer () {
-  if (typeof Peer === 'undefined') {
-    setTimeout(tryInitPeer, 50);
-    return;
-  }
+  if (typeof Peer === 'undefined') { setTimeout(tryInitPeer, 50); return; }
   initPeer();
 }
-  
+
 function initPeer () {
   const code = mkCode();
-  console.log(code);
-  peer = new Peer(code, { 
+  peer = new Peer(code, {
     host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 2,
     config: {
       iceServers: [
@@ -578,19 +915,14 @@ function initPeer () {
   });
   peer.on('open', function(id) {
     myId = id;
-    document.getElementById('my-peer-id').textContent = id.substring(0, 3) + "-" + id.substring(3,6);
+    document.getElementById('my-peer-id').textContent = id.substring(0, 3) + "-" + id.substring(3, 6);
     document.getElementById('connect-btn').disabled = false;
     document.getElementById('status-text').textContent = 'ready';
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
     log('system', 'Your code: ' + id);
   });
 
-  peer.on('connection', c => {
-    wire(c);
-    log('peer', 'Incoming connection…');
-    document.documentElement.classList.add('connected');
-  });
-  
+  peer.on('connection', c => { wire(c); log('peer', 'Incoming connection…'); document.documentElement.classList.add('connected'); });
 
   peer.on('error', err => {
     if (err.type === 'unavailable-id') { peer.destroy(); initPeer(); return; }
@@ -598,14 +930,10 @@ function initPeer () {
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 800);
   });
 
-  peer.on('disconnected', () => { 
+  peer.on('disconnected', () => {
     log('error', 'Connection lost. Attempting to reconnect…');
     document.documentElement.classList.remove('connected');
-    for(let i = 0; i < 20; i++) {
-      setTimeout(() => peer.reconnect(), i * 1000);
-    }
-    log('error', 'Connection lost. Reloading page...');
-    website.reload();
+    for (let i = 0; i < 20; i++) setTimeout(() => peer.reconnect(), i * 1000);
   });
 }
 
@@ -625,7 +953,7 @@ function wire (c) {
     log('peer', 'Connected to ' + c.peer);
     document.documentElement.classList.add('connected');
   });
-  c.on('data',  handle);
+  c.on('data', handle);
   c.on('close', () => {
     document.getElementById('status-pill').classList.remove('connected');
     document.getElementById('status-text').textContent = 'disconnected';
@@ -646,8 +974,30 @@ function handle (msg) {
   try {
     switch (msg.type) {
       case 'load':
+        // Peer loaded a video — add to queue if not already there, then play it
         applyLoad(msg.videoId, msg.time);
         log('peer', 'Friend loaded video · ' + msg.videoId);
+        break;
+      case 'queue_add':
+        // Peer added a video to the queue
+        queueAdd(msg.videoId, msg.title, msg.thumb);
+        log('peer', 'Friend queued: ' + (msg.title || msg.videoId));
+        break;
+      case 'queue_play':
+        queuePlayAt(msg.idx);
+        log('peer', 'Friend skipped to track ' + (msg.idx + 1));
+        break;
+      case 'queue_remove':
+        queueRemove(msg.idx);
+        log('peer', 'Friend removed track ' + (msg.idx + 1));
+        break;
+      case 'queue_sync':
+        // Full queue sync on connect
+        queue = msg.queue;
+        currentIndex = msg.currentIndex;
+        renderQueue();
+        updateQueueCount();
+        log('peer', 'Queue synced (' + queue.length + ' videos)');
         break;
       case 'play':
         if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); }
@@ -667,6 +1017,8 @@ function handle (msg) {
             time: ytPlayer.getCurrentTime(),
             playing: ytPlayer.getPlayerState() === 1
           });
+          // Also send full queue state
+          broadcast({ type: 'queue_sync', queue, currentIndex });
         }
         break;
       case 'sync_res':
@@ -682,14 +1034,26 @@ function handle (msg) {
 }
 
 /* ── Controls ────────────────────────────────────────────────────────────── */
-function submitVideo () {
+async function submitVideo () {
   const raw = document.getElementById('video-url').value.trim();
   const id  = extractId(raw);
   if (!id) { log('error', 'Could not parse YouTube URL'); return; }
-  applyLoad(id, 0);
-  broadcast({ type: 'load', videoId: id, time: 0 });
-  log('system', 'Loaded video · ' + id);
+
   document.getElementById('video-url').value = '';
+  log('system', 'Fetching video info…');
+
+  const meta = await fetchVideoMeta(id);
+
+  // Add to queue
+  queueAdd(id, meta.title, meta.thumb);
+  broadcast({ type: 'queue_add', videoId: id, title: meta.title, thumb: meta.thumb });
+  log('system', 'Queued: ' + meta.title);
+
+  // If nothing is playing, start this video
+  if (currentIndex === -1) {
+    queuePlayAt(queue.length - 1);
+    broadcast({ type: 'queue_play', idx: queue.length - 1 });
+  }
 }
 
 function applyLoad (videoId, startTime) {
@@ -746,7 +1110,7 @@ function copyId () {
 function log (type, msg) {
   const box  = document.getElementById('activity-log');
   const now  = new Date();
-  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2,'0')).join(':');
+  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
   const row  = document.createElement('div');
   row.className = 'log-entry ' + type;
   row.innerHTML = `<span class="log-time">${time}</span><span>${msg}</span>`;
