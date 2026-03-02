@@ -881,12 +881,12 @@ async function fetchDrDonPlaylist() {
     if (drDonPlaylist.length === 0) throw new Error('no entries parsed');
 
     btn.disabled = false;
-    btn.innerHTML = '<img src="Images/Don.png">';
+    btn.innerHTML = '<img src="Images/Don.png" width="30px">';
     log('system', `Dr. Don playlist loaded — ${drDonPlaylist.length} videos`);
   } catch (err) {
     drDonPlaylist = [];
     btn.disabled = false;
-    btn.innerHTML = '<img src="Images/Don.png">';
+    btn.innerHTML = '<img src="Images/Don.png" width="30px">';
     log('error', 'Playlist load failed: ' + err.message);
   }
 }
@@ -919,7 +919,7 @@ async function drDonButton() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<img src="Images/Don.png">';
+  btn.innerHTML = '<img src="Images/Don.png" width="30px">';
 }
 
 /* ── Queue ───────────────────────────────────────────────────────────────── */
