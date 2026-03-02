@@ -1407,8 +1407,9 @@ function wireAsGuest(c) {
     banono.currentTime = 0;
     banono.play()
       .catch(err => console.log('Audio play failed:', err));
-    hostConn = null;
-    location.reload();
+    banono.addEventListener('ended', () => {
+      location.reload();
+    });
   });
 
   c.on('error', err => log('error', err.message));
