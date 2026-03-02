@@ -1351,6 +1351,8 @@ function welcomeGuest(c) {
   c.on('error', err => log('error', err.message));
 }
 
+const banono = new Audio("audio/Banono.wav");
+
 /* ── Become GUEST ────────────────────────────────────────────────────────── */
 function wireAsGuest(c) {
   hostConn = c;
@@ -1376,6 +1378,9 @@ function wireAsGuest(c) {
     document.getElementById('disconnect-banner').classList.add('visible');
     document.getElementById('disconnect-banner').textContent = '⚠ Host disconnected. Reload to start a new session.';
     log('error', 'Host disconnected');
+    banono.currentTime = 0;
+    banono.play()
+      .catch(err => console.log('Audio play failed:', err));
     hostConn = null;
   });
 
