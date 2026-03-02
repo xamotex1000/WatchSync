@@ -847,7 +847,7 @@ async function addDrDon() {
     // Use YouTube RSS/oEmbed via a CORS-friendly proxy approach.
     // We'll fetch the channel page and scrape video IDs, or use the
     // YouTube Data API's RSS feed which doesn't require an API key.
-    const channelId = await fetchDrDonChannelId();
+    const channelId = "UCnXEy38-vDoe3s__bVIqrSw";
     const videoIds  = await fetchChannelVideos(channelId);
 
     if (!videoIds || videoIds.length === 0) {
@@ -873,19 +873,6 @@ async function addDrDon() {
     btn.classList.remove('loading');
     btn.textContent = '🎵 Dr. Don';
   }
-}
-
-async function fetchDrDonChannelId() {
-  // YouTube RSS feeds by handle — we use the channel's RSS via a search
-  // First try to get channel ID via oembed on a known handle URL
-  const res = await fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/@DrDonMusic&format=json');
-  if (res.ok) {
-    const data = await res.json();
-    // Extract channel ID from author_url like https://www.youtube.com/channel/UCxxxx
-    const match = data.author_url && data.author_url.match(/channel\/(UC[\w-]+)/);
-    if (match) return match[1];
-  }
-  throw new Error('Could not resolve channel ID');
 }
 
 async function fetchChannelVideos(channelId) {
