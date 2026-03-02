@@ -573,7 +573,7 @@ function initPeer () {
   });
   peer.on('open', function(id) {
     myId = id;
-    document.getElementById('my-peer-id').textContent = id;
+    document.getElementById('my-peer-id').textContent = id.substring(0, 3) + "-" + id.substring(3,6);
     document.getElementById('connect-btn').disabled = false;
     document.getElementById('status-text').textContent = 'ready';
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
