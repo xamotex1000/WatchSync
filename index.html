@@ -1097,8 +1097,8 @@ function handle(msg) {
       case 'queue_sync':  queue = msg.queue; currentIndex = msg.currentIndex; renderQueue(); updateQueueCount(); log('peer', 'Queue synced (' + queue.length + ' videos)'); break;
       case 'play':        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); } document.getElementById('play-btn').textContent = '⏸'; log('peer', 'Friend played at ' + fmt(msg.time)); break;
       case 'pause':       if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); } document.getElementById('play-btn').textContent = '▶'; log('peer', 'Friend paused at ' + fmt(msg.time)); break;
-      case 'sync_req':    if (ytReady) { broadcast({ type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1 }); broadcast({ type: 'queue_sync', queue, currentIndex }); } break;
-      case 'sync_res':    if (msg.videoId) applyLoad(msg.videoId, msg.time); if (msg.playing && ytReady) ytPlayer.playVideo(); log('peer', 'Synced · ' + fmt(msg.time)); setSyncLabel('SYNCED ✓', false); break;
+      case 'sync_req':    if (ytReady) { broadcast({type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1, sentAt: msg.sentAt}); broadcast({ type: 'queue_sync', queue, currentIndex }); } break;
+      case 'sync_res':    if (msg.videoId) { const rtt = Date.now() - (msg.sentAt || Date.now()); const latencyOffset = rtt / 2000; const adjustedTime = msg.time + (msg.playing ? latencyOffset : 0); applyLoad(msg.videoId, adjustedTime); if (msg.playing && ytReady) ytPlayer.playVideo(); log('peer', `Synced · ${fmt(adjustedTime)} (latency: ${Math.round(rtt/2)}ms)`); } setSyncLabel('SYNCED ✓', false); break;
     }
   } finally { setTimeout(() => { isSyncing = false; }, 400); }
 }
@@ -1130,7 +1130,8 @@ function togglePlay() {
 
 function syncNow() {
   if (!conn || !conn.open) { log('error', 'Not connected'); return; }
-  broadcast({ type: 'sync_req' });
+  conn._syncSentAt = Date.now();
+  broadcast({ type: 'sync_req', sentAt: Date.now() });
   setSyncLabel('SYNCING…', true);
   log('system', 'Sync request sent');
 }
