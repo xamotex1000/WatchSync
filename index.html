@@ -553,6 +553,7 @@ function mkCode () {
 
 function initPeer () {
   const code = mkCode();
+  console.log(code);
   peer = new Peer(code, {
     host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 0,
     config: {
