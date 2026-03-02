@@ -548,9 +548,7 @@ let peer = null, conn = null, myId = null;
 
 function mkCode () {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 3 }, () => chars[Math.random() * chars.length | 0]).join('') +
-    '-' +
-    Array.from({ length: 3 }, () => chars[Math.random() * chars.length | 0]).join('');
+  return Array.from({ length: 6 }, () => chars[Math.random() * chars.length | 0]).join('');
 }
 
 function initPeer () {
