@@ -572,14 +572,14 @@ function initPeer () {
     }
   });
   console.log("new Peer Done");
-  peer.on('open', id => {
+  peer.on('open', function(id) {
+    console.log("peer Opening" + id);
     myId = id;
     document.getElementById('my-peer-id').textContent = id;
     document.getElementById('connect-btn').disabled = false;
     document.getElementById('status-text').textContent = 'ready';
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
     log('system', 'Your code: ' + id);
-    console.log("peer Open Done");
   });
 
   peer.on('connection', c => {
