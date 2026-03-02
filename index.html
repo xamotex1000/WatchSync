@@ -571,7 +571,7 @@ function initPeer () {
       ]
     }
   });
-
+  console.log("new Peer Done");
   peer.on('open', id => {
     myId = id;
     document.getElementById('my-peer-id').textContent = id;
@@ -579,12 +579,15 @@ function initPeer () {
     document.getElementById('status-text').textContent = 'ready';
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
     log('system', 'Your code: ' + id);
+    console.log("peer Open Done");
   });
 
   peer.on('connection', c => {
     wire(c);
     log('peer', 'Incoming connection…');
+    console.log("peer Connection Done");
   });
+  
 
   peer.on('error', err => {
     if (err.type === 'unavailable-id') { peer.destroy(); initPeer(); return; }
