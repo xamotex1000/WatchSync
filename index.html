@@ -20,6 +20,11 @@
     --green: #47ff8a;
   }
 
+  :root.connected {
+    --accent: #47ff57;
+    --accent2: #4757ff;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -583,6 +588,7 @@ function initPeer () {
   peer.on('connection', c => {
     wire(c);
     log('peer', 'Incoming connection…');
+    console.log("AAAAAAAA");
   });
   
 
@@ -592,7 +598,14 @@ function initPeer () {
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 800);
   });
 
-  peer.on('disconnected', () => { peer.reconnect(); });
+  peer.on('disconnected', () => { 
+    log('error', 'Connection lost. Attempting to reconnect…');
+    for(let i = 0; i < 20; i++) {
+      setTimeout(() => peer.reconnect(), i * 1000);
+    }
+    log('error', 'Connection lost. Reloading page...');
+    website.reload();
+  });
 }
 
 function connectToPeer () {
