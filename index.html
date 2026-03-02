@@ -1562,31 +1562,23 @@ function colorPress(color) {
   }
 }
 
-const DR_DON_PLAYLIST_ID = 'UUnXEy38-vDoe3s__bVIqrSw';
-
 async function fetchDrDonPlaylist() {
   const btn = document.getElementById('dr-don-btn');
   btn.disabled = true;
   btn.textContent = '⏳ Loading…';
+
   try {
-    const rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${DR_DON_PLAYLIST_ID}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-    const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error('proxy error ' + res.status);
-    const data = await res.json();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(data.contents, 'application/xml');
-    const entries = xml.querySelectorAll('entry');
-    drDonPlaylist = [];
-    entries.forEach(entry => {
-      const videoIdEl = entry.querySelector('videoId');
-      const titleEl   = entry.querySelector('title');
-      if (videoIdEl) drDonPlaylist.push({ videoId: videoIdEl.textContent.trim(), title: titleEl ? titleEl.textContent.trim() : videoIdEl.textContent.trim() });
-    });
-    if (drDonPlaylist.length === 0) throw new Error('no entries parsed');
+    const res = await fetch('data/drdon.json?cacheBust=' + Date.now());
+    if (!res.ok) throw new Error('Failed to load JSON');
+
+    drDonPlaylist = await res.json();
+
+    if (!drDonPlaylist.length) throw new Error('Empty playlist');
+
     btn.disabled = false;
     btn.innerHTML = '<img src="Images/Don.png" width="30px">';
     log('system', `Dr. Don playlist loaded — ${drDonPlaylist.length} videos`);
+
   } catch (err) {
     drDonPlaylist = [];
     btn.disabled = false;

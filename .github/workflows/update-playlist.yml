@@ -1,0 +1,33 @@
+name: Update Dr Don Playlist
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"  # runs daily at 6am UTC
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch playlist
+        run: node scripts/fetchPlaylist.js
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          PLAYLIST_ID: ${{ secrets.DR_DON_PLAYLIST_ID }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/drdon.json
+          git commit -m "Update Dr Don playlist" || echo "No changes"
+          git push
