@@ -588,7 +588,7 @@ function initPeer () {
   peer.on('connection', c => {
     wire(c);
     log('peer', 'Incoming connection…');
-    console.log("AAAAAAAA");
+    document.documentElement.classList.add('connected');
   });
   
 
@@ -600,6 +600,7 @@ function initPeer () {
 
   peer.on('disconnected', () => { 
     log('error', 'Connection lost. Attempting to reconnect…');
+    document.documentElement.classList.remove('connected');
     for(let i = 0; i < 20; i++) {
       setTimeout(() => peer.reconnect(), i * 1000);
     }
@@ -622,6 +623,7 @@ function wire (c) {
     document.getElementById('status-text').textContent = 'connected · ' + c.peer;
     document.getElementById('player-section').classList.add('visible');
     log('peer', 'Connected to ' + c.peer);
+    document.documentElement.classList.add('connected');
   });
   c.on('data',  handle);
   c.on('close', () => {
