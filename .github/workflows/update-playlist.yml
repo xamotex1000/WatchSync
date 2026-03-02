@@ -1,11 +1,12 @@
 name: Update Dr Don Playlist
 
 on:
-  permissions:
-    contents: write
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # runs daily at 6am UTC
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: write
 
 jobs:
   update:
