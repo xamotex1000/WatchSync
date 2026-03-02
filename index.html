@@ -8,6 +8,7 @@
 <link rel="icon" href="Images/Logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
   :root {
@@ -264,6 +265,21 @@
     align-items: flex-end;
     gap: 12px;
     flex-shrink: 0;
+  }
+  
+  .party-disconnect-btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 40, 57, 0.377);
+    background: rgba(255,71,87,0.07);
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .party-peers-display {
@@ -1036,6 +1052,11 @@
           <div class="party-peers-count" id="party-peers-count">1</div>
         </div>
         <div class="party-peers-list" id="party-peers-list"></div>
+        <div class="party-disconnect-btn" id="leave-party-btn" onclick="leaveParty()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M10 17l5-5-5-5v3H0v4h10v3zm9-12H5c-1.1 0-2 .9-2 2v4h2V7h14v10H5v-4H3v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -1147,6 +1168,10 @@ function getDisplayName(peerId) {
   if (!peerId) return '???';
   const name = peerUsernames.get(peerId);
   return name || peerId.substring(0, 6);
+}
+
+function leaveParty() {
+  location.reload();
 }
 
 /* ── YouTube IFrame API ──────────────────────────────────────────────────── */
@@ -1382,6 +1407,7 @@ function wireAsGuest(c) {
     banono.play()
       .catch(err => console.log('Audio play failed:', err));
     hostConn = null;
+    location.reload();
   });
 
   c.on('error', err => log('error', err.message));
