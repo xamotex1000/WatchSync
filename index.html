@@ -6,7 +6,7 @@
 <title>WatchSync — Synchronized Cinema</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
   :root {
     --bg: #0a0a0a;
@@ -550,7 +550,15 @@ function mkCode () {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 6 }, () => chars[Math.random() * chars.length | 0]).join('');
 }
-
+  
+function tryInitPeer () {
+  if (typeof Peer === 'undefined') {
+    setTimeout(tryInitPeer, 50);
+    return;
+  }
+  initPeer();
+}
+  
 function initPeer () {
   const code = mkCode();
   console.log(code);
@@ -743,7 +751,7 @@ const yt = document.createElement('script');
 yt.src = 'https://www.youtube.com/iframe_api';
 document.head.appendChild(yt);
 
-initPeer();
+tryInitPeer();
 </script>
 </body>
 </html>
