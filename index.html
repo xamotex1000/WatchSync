@@ -56,6 +56,8 @@
     background: rgba(10,10,10,0.92);
     backdrop-filter: blur(12px);
     z-index: 100;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
   .logo {
@@ -67,6 +69,13 @@
   }
 
   .logo span { color: var(--text); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 
   .status-pill {
     display: flex;
@@ -98,6 +107,93 @@
   }
 
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── Cheat Buttons ── */
+  .cheat-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cheat-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .cheat-btn:hover { transform: scale(1.15); filter: brightness(1.2); }
+  .cheat-btn:active { transform: scale(0.9); }
+
+  .cheat-btn.lit {
+    box-shadow: 0 0 14px 4px currentColor;
+    transform: scale(1.15);
+  }
+
+  .cheat-btn.red    { background: #ff4757; border-color: #ff6b78; color: #ff4757; }
+  .cheat-btn.green  { background: #2ed573; border-color: #5dff9d; color: #2ed573; }
+  .cheat-btn.yellow { background: #ffd32a; border-color: #ffe566; color: #ffd32a; }
+  .cheat-btn.blue   { background: #1e90ff; border-color: #5aafff; color: #1e90ff; }
+
+  .cheat-divider {
+    width: 1px; height: 20px;
+    background: var(--border);
+    margin: 0 2px;
+  }
+
+  /* Dr. Don button */
+  #dr-don-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    background: linear-gradient(135deg, #ff6b35, #f7c028, #1a936f, #004e89, #c200fb);
+    background-size: 400% 400%;
+    animation: drDonShimmer 4s ease infinite;
+    border: none;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #fff;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  #dr-don-btn.visible { display: flex; }
+
+  #dr-don-btn:hover {
+    transform: scale(1.06);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 24px rgba(255,107,53,0.5);
+  }
+
+  #dr-don-btn:active { transform: scale(0.97); }
+
+  #dr-don-btn.loading {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  @keyframes drDonShimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* sequence flash */
+  @keyframes cheatFlash {
+    0%   { transform: scale(1.3); }
+    60%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
 
   main { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
 
@@ -372,7 +468,6 @@
   }
 
   .queue-item:last-child { border-bottom: none; }
-
   .queue-item:hover { background: var(--surface2); }
 
   .queue-item.active {
@@ -391,14 +486,10 @@
     flex-shrink: 0;
   }
 
-  .queue-item.active .queue-index {
-    color: var(--accent);
-    font-size: 14px;
-  }
+  .queue-item.active .queue-index { color: var(--accent); font-size: 14px; }
 
   .queue-thumb {
-    width: 80px;
-    height: 45px;
+    width: 80px; height: 45px;
     border-radius: 6px;
     object-fit: cover;
     background: var(--surface2);
@@ -410,16 +501,14 @@
   }
 
   .queue-thumb-img {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: cover;
     border-radius: 5px;
     display: block;
   }
 
   .queue-thumb-placeholder {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -526,8 +615,8 @@
 
   .log-time { color: var(--border); flex-shrink: 0; }
   .log-entry.system { color: var(--accent); }
-  .log-entry.peer { color: var(--green); }
-  .log-entry.error { color: var(--accent2); }
+  .log-entry.peer   { color: var(--green); }
+  .log-entry.error  { color: var(--accent2); }
 
   #init-overlay {
     position: fixed;
@@ -603,6 +692,7 @@
     header { padding: 16px; }
     .url-submit-row { flex-direction: column; }
     .queue-thumb { width: 60px; height: 34px; }
+    .cheat-btn { width: 22px; height: 22px; }
   }
 </style>
 </head>
@@ -616,9 +706,25 @@
 
 <header>
   <div class="logo">WATCH<span>SYNC</span></div>
-  <div class="status-pill" id="status-pill">
-    <div class="status-dot"></div>
-    <span id="status-text">connecting...</span>
+
+  <div class="header-right">
+    <!-- Cheat code buttons -->
+    <div class="cheat-buttons">
+      <button class="cheat-btn red"    id="cheat-R" onclick="cheatPress('R')" title="Red"></button>
+      <button class="cheat-btn green"  id="cheat-G" onclick="cheatPress('G')" title="Green"></button>
+      <button class="cheat-btn yellow" id="cheat-Y" onclick="cheatPress('Y')" title="Yellow"></button>
+      <button class="cheat-btn blue"   id="cheat-B" onclick="cheatPress('B')" title="Blue"></button>
+    </div>
+
+    <div class="cheat-divider"></div>
+
+    <!-- Dr. Don button — hidden until code entered -->
+    <button id="dr-don-btn" onclick="addDrDon()">🎵 Dr. Don</button>
+
+    <div class="status-pill" id="status-pill">
+      <div class="status-dot"></div>
+      <span id="status-text">connecting...</span>
+    </div>
   </div>
 </header>
 
@@ -689,6 +795,140 @@
 </main>
 
 <script>
+/* ── Cheat Code ──────────────────────────────────────────────────────────── */
+// Sequence: R R G B R Y
+const CHEAT_SEQUENCE = ['R','R','G','B','R','Y'];
+let cheatProgress = [];
+let drDonUnlocked = false;
+
+function cheatPress(color) {
+  const btn = document.getElementById('cheat-' + color);
+
+  // Flash the button
+  btn.classList.add('lit');
+  setTimeout(() => btn.classList.remove('lit'), 300);
+
+  cheatProgress.push(color);
+
+  // Trim to last N presses
+  if (cheatProgress.length > CHEAT_SEQUENCE.length) {
+    cheatProgress.shift();
+  }
+
+  // Check if sequence matches
+  if (cheatProgress.length === CHEAT_SEQUENCE.length &&
+      cheatProgress.every((c, i) => c === CHEAT_SEQUENCE[i])) {
+    if (!drDonUnlocked) {
+      drDonUnlocked = true;
+      document.getElementById('dr-don-btn').classList.add('visible');
+      // Party flash all buttons
+      ['R','G','Y','B'].forEach((c, i) => {
+        setTimeout(() => {
+          const b = document.getElementById('cheat-' + c);
+          b.classList.add('lit');
+          setTimeout(() => b.classList.remove('lit'), 400);
+        }, i * 120);
+      });
+      log('system', '🎵 Dr. Don unlocked!');
+    }
+    cheatProgress = [];
+  }
+}
+
+/* ── Dr. Don ─────────────────────────────────────────────────────────────── */
+async function addDrDon() {
+  const btn = document.getElementById('dr-don-btn');
+  if (btn.classList.contains('loading')) return;
+
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Fetching...';
+
+  try {
+    // Use YouTube RSS/oEmbed via a CORS-friendly proxy approach.
+    // We'll fetch the channel page and scrape video IDs, or use the
+    // YouTube Data API's RSS feed which doesn't require an API key.
+    const channelId = await fetchDrDonChannelId();
+    const videoIds  = await fetchChannelVideos(channelId);
+
+    if (!videoIds || videoIds.length === 0) {
+      throw new Error('No videos found');
+    }
+
+    const randomId = videoIds[Math.floor(Math.random() * videoIds.length)];
+    const meta = await fetchVideoMeta(randomId);
+
+    queueAdd(randomId, meta.title, meta.thumb);
+    broadcast({ type: 'queue_add', videoId: randomId, title: meta.title, thumb: meta.thumb });
+    log('system', '🎵 Dr. Don queued: ' + meta.title);
+
+    if (currentIndex === -1) {
+      queuePlayAt(queue.length - 1);
+      broadcast({ type: 'queue_play', idx: queue.length - 1 });
+    }
+  } catch (err) {
+    log('error', 'Dr. Don fetch failed: ' + err.message);
+    // Fallback: use known Dr. Don channel handle search
+    await drDonFallback();
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = '🎵 Dr. Don';
+  }
+}
+
+async function fetchDrDonChannelId() {
+  // YouTube RSS feeds by handle — we use the channel's RSS via a search
+  // First try to get channel ID via oembed on a known handle URL
+  const res = await fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/@DrDonMusic&format=json');
+  if (res.ok) {
+    const data = await res.json();
+    // Extract channel ID from author_url like https://www.youtube.com/channel/UCxxxx
+    const match = data.author_url && data.author_url.match(/channel\/(UC[\w-]+)/);
+    if (match) return match[1];
+  }
+  throw new Error('Could not resolve channel ID');
+}
+
+async function fetchChannelVideos(channelId) {
+  // YouTube provides a public RSS feed for channels — no API key needed!
+  const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+  // We need a CORS proxy to fetch this
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+
+  const res = await fetch(proxyUrl);
+  if (!res.ok) throw new Error('RSS fetch failed');
+  const data = await res.json();
+  const text = data.contents;
+
+  // Parse video IDs from the RSS XML
+  const matches = [...text.matchAll(/yt:videoId>([^<]+)</g)];
+  return matches.map(m => m[1]).filter(Boolean);
+}
+
+async function drDonFallback() {
+  // Try alternate proxy
+  try {
+    const rssUrl = 'https://www.youtube.com/feeds/videos.xml?user=DrDonMusic';
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const matches = [...data.contents.matchAll(/yt:videoId>([^<]+)</g)];
+    const ids = matches.map(m => m[1]).filter(Boolean);
+    if (ids.length > 0) {
+      const randomId = ids[Math.floor(Math.random() * ids.length)];
+      const meta = await fetchVideoMeta(randomId);
+      queueAdd(randomId, meta.title, meta.thumb);
+      broadcast({ type: 'queue_add', videoId: randomId, title: meta.title, thumb: meta.thumb });
+      log('system', '🎵 Dr. Don queued: ' + meta.title);
+      if (currentIndex === -1) {
+        queuePlayAt(queue.length - 1);
+        broadcast({ type: 'queue_play', idx: queue.length - 1 });
+      }
+    }
+  } catch(e) {
+    log('error', 'Could not load Dr. Don videos. Check network settings.');
+  }
+}
+
 /* ── YouTube IFrame API ──────────────────────────────────────────────────── */
 let ytPlayer = null;
 let ytReady  = false;
@@ -722,15 +962,15 @@ function onPlayerStateChange (e) {
   if (now - lastEventMs < 250) return;
   lastEventMs = now;
 
-  if (e.data === 1) { // PLAYING
+  if (e.data === 1) {
     document.getElementById('play-btn').textContent = '⏸';
     broadcast({ type: 'play', time: ytPlayer.getCurrentTime() });
     log('system', 'You played at ' + fmt(ytPlayer.getCurrentTime()));
-  } else if (e.data === 2) { // PAUSED
+  } else if (e.data === 2) {
     document.getElementById('play-btn').textContent = '▶';
     broadcast({ type: 'pause', time: ytPlayer.getCurrentTime() });
     log('system', 'You paused at ' + fmt(ytPlayer.getCurrentTime()));
-  } else if (e.data === 0) { // ENDED — auto-advance queue
+  } else if (e.data === 0) {
     advanceQueue();
   }
 }
@@ -748,9 +988,8 @@ function fmt (s) {
 }
 
 /* ── Queue ───────────────────────────────────────────────────────────────── */
-// Each item: { videoId, title, thumb }
 let queue = [];
-let currentIndex = -1; // index of currently playing video
+let currentIndex = -1;
 
 function queueAdd (videoId, title, thumb) {
   queue.push({ videoId, title: title || videoId, thumb: thumb || null });
@@ -759,7 +998,7 @@ function queueAdd (videoId, title, thumb) {
 }
 
 function queueRemove (idx) {
-  if (idx === currentIndex) return; // don't remove currently playing
+  if (idx === currentIndex) return;
   queue.splice(idx, 1);
   if (currentIndex > idx) currentIndex--;
   renderQueue();
@@ -776,49 +1015,37 @@ function queuePlayAt (idx) {
 }
 
 function advanceQueue () {
-  if (currentIndex < queue.length - 1) {
-    queuePlayAt(currentIndex + 1);
-  }
+  if (currentIndex < queue.length - 1) queuePlayAt(currentIndex + 1);
 }
 
 function renderQueue () {
   const list  = document.getElementById('queue-list');
   const empty = document.getElementById('queue-empty');
-
-  // Remove all item elements (keep empty placeholder in DOM)
   [...list.querySelectorAll('.queue-item')].forEach(el => el.remove());
 
-  if (queue.length === 0) {
-    empty.style.display = '';
-    return;
-  }
-
+  if (queue.length === 0) { empty.style.display = ''; return; }
   empty.style.display = 'none';
 
   queue.forEach((item, idx) => {
     const el = document.createElement('div');
     el.className = 'queue-item' + (idx === currentIndex ? ' active' : '');
 
-    // Index / now playing indicator
     const indexEl = document.createElement('div');
     indexEl.className = 'queue-index';
     indexEl.textContent = idx === currentIndex ? '▶' : (idx + 1);
 
-    // Thumbnail
     const thumbEl = document.createElement('div');
     thumbEl.className = 'queue-thumb';
     if (item.thumb) {
       const img = document.createElement('img');
       img.className = 'queue-thumb-img';
-      img.src = item.thumb;
-      img.alt = '';
+      img.src = item.thumb; img.alt = '';
       img.onerror = () => { img.style.display = 'none'; thumbEl.innerHTML += '<div class="queue-thumb-placeholder">▶</div>'; };
       thumbEl.appendChild(img);
     } else {
       thumbEl.innerHTML = '<div class="queue-thumb-placeholder">▶</div>';
     }
 
-    // Meta
     const meta = document.createElement('div');
     meta.className = 'queue-meta';
     const titleEl = document.createElement('div');
@@ -836,15 +1063,11 @@ function renderQueue () {
       meta.appendChild(badge);
     }
 
-    // Delete btn
     const del = document.createElement('button');
     del.className = 'queue-delete-btn';
     del.title = idx === currentIndex ? 'Currently playing — cannot remove' : 'Remove from queue';
     del.innerHTML = '🗑';
-    if (idx === currentIndex) {
-      del.style.opacity = '0';
-      del.style.pointerEvents = 'none';
-    }
+    if (idx === currentIndex) { del.style.opacity = '0'; del.style.pointerEvents = 'none'; }
     del.addEventListener('click', (e) => {
       e.stopPropagation();
       queueRemove(idx);
@@ -855,37 +1078,23 @@ function renderQueue () {
     el.appendChild(thumbEl);
     el.appendChild(meta);
     el.appendChild(del);
-
-    // Click to play
-    el.addEventListener('click', () => {
-      queuePlayAt(idx);
-      broadcast({ type: 'queue_play', idx });
-    });
-
+    el.addEventListener('click', () => { queuePlayAt(idx); broadcast({ type: 'queue_play', idx }); });
     list.appendChild(el);
   });
 }
 
 function updateQueueCount () {
-  const el = document.getElementById('queue-count');
-  el.textContent = queue.length + (queue.length === 1 ? ' video' : ' videos');
+  document.getElementById('queue-count').textContent = queue.length + (queue.length === 1 ? ' video' : ' videos');
 }
 
-/* Fetch YouTube title via oEmbed (no API key needed) */
 async function fetchVideoMeta (videoId) {
   try {
     const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
     if (!res.ok) throw new Error('oembed failed');
     const data = await res.json();
-    return {
-      title: data.title || videoId,
-      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
-    };
+    return { title: data.title || videoId, thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
   } catch {
-    return {
-      title: videoId,
-      thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
-    };
+    return { title: videoId, thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
   }
 }
 
@@ -906,12 +1115,7 @@ function initPeer () {
   const code = mkCode();
   peer = new Peer(code, {
     host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 2,
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-      ]
-    }
+    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
   });
   peer.on('open', function(id) {
     myId = id;
@@ -921,15 +1125,12 @@ function initPeer () {
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
     log('system', 'Your code: ' + id);
   });
-
   peer.on('connection', c => { wire(c); log('peer', 'Incoming connection…'); document.documentElement.classList.add('connected'); });
-
   peer.on('error', err => {
     if (err.type === 'unavailable-id') { peer.destroy(); initPeer(); return; }
     log('error', 'Error: ' + err.message);
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 800);
   });
-
   peer.on('disconnected', () => {
     log('error', 'Connection lost. Attempting to reconnect…');
     document.documentElement.classList.remove('connected');
@@ -974,12 +1175,10 @@ function handle (msg) {
   try {
     switch (msg.type) {
       case 'load':
-        // Peer loaded a video — add to queue if not already there, then play it
         applyLoad(msg.videoId, msg.time);
         log('peer', 'Friend loaded video · ' + msg.videoId);
         break;
       case 'queue_add':
-        // Peer added a video to the queue
         queueAdd(msg.videoId, msg.title, msg.thumb);
         log('peer', 'Friend queued: ' + (msg.title || msg.videoId));
         break;
@@ -992,7 +1191,6 @@ function handle (msg) {
         log('peer', 'Friend removed track ' + (msg.idx + 1));
         break;
       case 'queue_sync':
-        // Full queue sync on connect
         queue = msg.queue;
         currentIndex = msg.currentIndex;
         renderQueue();
@@ -1011,13 +1209,7 @@ function handle (msg) {
         break;
       case 'sync_req':
         if (ytReady) {
-          broadcast({
-            type: 'sync_res',
-            videoId: getVideoId(),
-            time: ytPlayer.getCurrentTime(),
-            playing: ytPlayer.getPlayerState() === 1
-          });
-          // Also send full queue state
+          broadcast({ type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1 });
           broadcast({ type: 'queue_sync', queue, currentIndex });
         }
         break;
@@ -1043,13 +1235,10 @@ async function submitVideo () {
   log('system', 'Fetching video info…');
 
   const meta = await fetchVideoMeta(id);
-
-  // Add to queue
   queueAdd(id, meta.title, meta.thumb);
   broadcast({ type: 'queue_add', videoId: id, title: meta.title, thumb: meta.thumb });
   log('system', 'Queued: ' + meta.title);
 
-  // If nothing is playing, start this video
   if (currentIndex === -1) {
     queuePlayAt(queue.length - 1);
     broadcast({ type: 'queue_play', idx: queue.length - 1 });
