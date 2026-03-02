@@ -56,8 +56,6 @@
     background: rgba(10,10,10,0.92);
     backdrop-filter: blur(12px);
     z-index: 100;
-    gap: 16px;
-    flex-wrap: wrap;
   }
 
   .logo {
@@ -74,9 +72,82 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
   }
 
+  /* ── Color Buttons ── */
+  .color-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .color-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    outline: none;
+    flex-shrink: 0;
+  }
+
+  .color-btn:hover { transform: scale(1.2); }
+  .color-btn:active { transform: scale(0.88); }
+
+  .color-btn.red    { background: #ff3b3b; border-color: rgba(255,59,59,0.45); box-shadow: 0 0 10px rgba(255,59,59,0.3); }
+  .color-btn.green  { background: #3bff6a; border-color: rgba(59,255,106,0.45); box-shadow: 0 0 10px rgba(59,255,106,0.3); }
+  .color-btn.yellow { background: #ffe83b; border-color: rgba(255,232,59,0.45); box-shadow: 0 0 10px rgba(255,232,59,0.3); }
+  .color-btn.blue   { background: #3b8eff; border-color: rgba(59,142,255,0.45); box-shadow: 0 0 10px rgba(59,142,255,0.3); }
+
+  .color-btn.red:hover    { box-shadow: 0 0 20px rgba(255,59,59,0.75); }
+  .color-btn.green:hover  { box-shadow: 0 0 20px rgba(59,255,106,0.75); }
+  .color-btn.yellow:hover { box-shadow: 0 0 20px rgba(255,232,59,0.75); }
+  .color-btn.blue:hover   { box-shadow: 0 0 20px rgba(59,142,255,0.75); }
+
+  .color-btn.flash { animation: btnFlash 0.32s ease; }
+
+  @keyframes btnFlash {
+    0%   { transform: scale(1);    filter: brightness(1); }
+    40%  { transform: scale(1.4);  filter: brightness(2.2); }
+    100% { transform: scale(1);    filter: brightness(1); }
+  }
+
+  /* ── Dr. Don Button ── */
+  .dr-don-btn {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.7);
+    background: linear-gradient(135deg, #1a1200, #3a2a00);
+    color: gold;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+    animation: goldenPulse 2.5s infinite;
+  }
+
+  .dr-don-btn.visible { display: flex; }
+
+  .dr-don-btn:hover {
+    background: linear-gradient(135deg, #2e1e00, #5a4000);
+    box-shadow: 0 0 24px rgba(255,215,0,0.5);
+    transform: translateY(-1px);
+  }
+
+  .dr-don-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; animation: none; }
+
+  @keyframes goldenPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.3);  border-color: rgba(255,215,0,0.5); }
+    50%       { box-shadow: 0 0 22px rgba(255,215,0,0.65); border-color: gold; }
+  }
+
+  /* ── Status ── */
   .status-pill {
     display: flex;
     align-items: center;
@@ -107,93 +178,6 @@
   }
 
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-  /* ── Cheat Buttons ── */
-  .cheat-buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .cheat-btn {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .cheat-btn:hover { transform: scale(1.15); filter: brightness(1.2); }
-  .cheat-btn:active { transform: scale(0.9); }
-
-  .cheat-btn.lit {
-    box-shadow: 0 0 14px 4px currentColor;
-    transform: scale(1.15);
-  }
-
-  .cheat-btn.red    { background: #ff4757; border-color: #ff6b78; color: #ff4757; }
-  .cheat-btn.green  { background: #2ed573; border-color: #5dff9d; color: #2ed573; }
-  .cheat-btn.yellow { background: #ffd32a; border-color: #ffe566; color: #ffd32a; }
-  .cheat-btn.blue   { background: #1e90ff; border-color: #5aafff; color: #1e90ff; }
-
-  .cheat-divider {
-    width: 1px; height: 20px;
-    background: var(--border);
-    margin: 0 2px;
-  }
-
-  /* Dr. Don button */
-  #dr-don-btn {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 16px;
-    background: linear-gradient(135deg, #ff6b35, #f7c028, #1a936f, #004e89, #c200fb);
-    background-size: 400% 400%;
-    animation: drDonShimmer 4s ease infinite;
-    border: none;
-    border-radius: 100px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: #fff;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
-    white-space: nowrap;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-  }
-
-  #dr-don-btn.visible { display: flex; }
-
-  #dr-don-btn:hover {
-    transform: scale(1.06);
-    filter: brightness(1.1);
-    box-shadow: 0 4px 24px rgba(255,107,53,0.5);
-  }
-
-  #dr-don-btn:active { transform: scale(0.97); }
-
-  #dr-don-btn.loading {
-    pointer-events: none;
-    opacity: 0.6;
-  }
-
-  @keyframes drDonShimmer {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  /* sequence flash */
-  @keyframes cheatFlash {
-    0%   { transform: scale(1.3); }
-    60%  { transform: scale(0.9); }
-    100% { transform: scale(1); }
-  }
 
   main { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
 
@@ -405,7 +389,6 @@
     border-color: rgba(232,255,71,0.2);
   }
 
-  /* ── QUEUE ── */
   .queue-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -445,10 +428,7 @@
     opacity: 0.5;
   }
 
-  .queue-list {
-    display: flex;
-    flex-direction: column;
-  }
+  .queue-list { display: flex; flex-direction: column; }
 
   .queue-item {
     display: flex;
@@ -491,7 +471,6 @@
   .queue-thumb {
     width: 80px; height: 45px;
     border-radius: 6px;
-    object-fit: cover;
     background: var(--surface2);
     flex-shrink: 0;
     border: 1px solid var(--border);
@@ -582,7 +561,6 @@
     background: rgba(255,71,87,0.08);
   }
 
-  /* ── ACTIVITY ── */
   .activity-panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -644,11 +622,8 @@
 
   @keyframes flicker {
     0%, 100% { opacity: 1; }
-    92% { opacity: 1; }
-    93% { opacity: 0.8; }
-    94% { opacity: 1; }
-    96% { opacity: 0.9; }
-    97% { opacity: 1; }
+    92% { opacity: 1; } 93% { opacity: 0.8; } 94% { opacity: 1; }
+    96% { opacity: 0.9; } 97% { opacity: 1; }
   }
 
   .init-sub {
@@ -692,7 +667,8 @@
     header { padding: 16px; }
     .url-submit-row { flex-direction: column; }
     .queue-thumb { width: 60px; height: 34px; }
-    .cheat-btn { width: 22px; height: 22px; }
+    .color-btn { width: 22px; height: 22px; }
+    .dr-don-btn { font-size: 9px; padding: 5px 10px; }
   }
 </style>
 </head>
@@ -706,21 +682,16 @@
 
 <header>
   <div class="logo">WATCH<span>SYNC</span></div>
-
   <div class="header-right">
-    <!-- Cheat code buttons -->
-    <div class="cheat-buttons">
-      <button class="cheat-btn red"    id="cheat-R" onclick="cheatPress('R')" title="Red"></button>
-      <button class="cheat-btn green"  id="cheat-G" onclick="cheatPress('G')" title="Green"></button>
-      <button class="cheat-btn yellow" id="cheat-Y" onclick="cheatPress('Y')" title="Yellow"></button>
-      <button class="cheat-btn blue"   id="cheat-B" onclick="cheatPress('B')" title="Blue"></button>
+    <div class="color-btns">
+      <button class="color-btn red"    title="Red"    onclick="colorPress('red')"></button>
+      <button class="color-btn green"  title="Green"  onclick="colorPress('green')"></button>
+      <button class="color-btn yellow" title="Yellow" onclick="colorPress('yellow')"></button>
+      <button class="color-btn blue"   title="Blue"   onclick="colorPress('blue')"></button>
     </div>
-
-    <div class="cheat-divider"></div>
-
-    <!-- Dr. Don button — hidden until code entered -->
-    <button id="dr-don-btn" onclick="addDrDon()">🎵 Dr. Don</button>
-
+    <button class="dr-don-btn" id="dr-don-btn" onclick="drDonButton()">
+      🎬 Dr. Don Button
+    </button>
     <div class="status-pill" id="status-pill">
       <div class="status-dot"></div>
       <span id="status-text">connecting...</span>
@@ -776,7 +747,6 @@
       <div class="time-display" id="time-display">0:00 / 0:00</div>
     </div>
 
-    <!-- Queue -->
     <div class="queue-section">
       <div class="queue-header">
         <div class="panel-label" style="margin-bottom:0">// Queue</div>
@@ -795,138 +765,12 @@
 </main>
 
 <script>
-/* ── Cheat Code ──────────────────────────────────────────────────────────── */
-// Sequence: R R G B R Y
-const CHEAT_SEQUENCE = ['R','R','G','B','R','Y'];
-let cheatProgress = [];
-let drDonUnlocked = false;
-
-function cheatPress(color) {
-  const btn = document.getElementById('cheat-' + color);
-
-  // Flash the button
-  btn.classList.add('lit');
-  setTimeout(() => btn.classList.remove('lit'), 300);
-
-  cheatProgress.push(color);
-
-  // Trim to last N presses
-  if (cheatProgress.length > CHEAT_SEQUENCE.length) {
-    cheatProgress.shift();
-  }
-
-  // Check if sequence matches
-  if (cheatProgress.length === CHEAT_SEQUENCE.length &&
-      cheatProgress.every((c, i) => c === CHEAT_SEQUENCE[i])) {
-    if (!drDonUnlocked) {
-      drDonUnlocked = true;
-      document.getElementById('dr-don-btn').classList.add('visible');
-      // Party flash all buttons
-      ['R','G','Y','B'].forEach((c, i) => {
-        setTimeout(() => {
-          const b = document.getElementById('cheat-' + c);
-          b.classList.add('lit');
-          setTimeout(() => b.classList.remove('lit'), 400);
-        }, i * 120);
-      });
-      log('system', '🎵 Dr. Don unlocked!');
-    }
-    cheatProgress = [];
-  }
-}
-
-/* ── Dr. Don ─────────────────────────────────────────────────────────────── */
-async function addDrDon() {
-  const btn = document.getElementById('dr-don-btn');
-  if (btn.classList.contains('loading')) return;
-
-  btn.classList.add('loading');
-  btn.textContent = '⏳ Fetching...';
-
-  try {
-    // Use YouTube RSS/oEmbed via a CORS-friendly proxy approach.
-    // We'll fetch the channel page and scrape video IDs, or use the
-    // YouTube Data API's RSS feed which doesn't require an API key.
-    const channelId = "UCnXEy38-vDoe3s__bVIqrSw";
-    const videoIds  = await fetchChannelVideos(channelId);
-
-    if (!videoIds || videoIds.length === 0) {
-      throw new Error('No videos found');
-    }
-
-    const randomId = videoIds[Math.floor(Math.random() * videoIds.length)];
-    const meta = await fetchVideoMeta(randomId);
-
-    queueAdd(randomId, meta.title, meta.thumb);
-    broadcast({ type: 'queue_add', videoId: randomId, title: meta.title, thumb: meta.thumb });
-    log('system', '🎵 Dr. Don queued: ' + meta.title);
-
-    if (currentIndex === -1) {
-      queuePlayAt(queue.length - 1);
-      broadcast({ type: 'queue_play', idx: queue.length - 1 });
-    }
-  } catch (err) {
-    log('error', 'Dr. Don fetch failed: ' + err.message);
-    // Fallback: use known Dr. Don channel handle search
-    await drDonFallback();
-  } finally {
-    btn.classList.remove('loading');
-    btn.textContent = '🎵 Dr. Don';
-  }
-}
-
-async function fetchChannelVideos(channelId) {
-  // YouTube provides a public RSS feed for channels — no API key needed!
-  const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
-  // We need a CORS proxy to fetch this
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-
-  const res = await fetch(proxyUrl);
-  if (!res.ok) throw new Error('RSS fetch failed');
-  const data = await res.json();
-  const text = data.contents;
-
-  // Parse video IDs from the RSS XML
-  const matches = [...text.matchAll(/yt:videoId>([^<]+)</g)];
-  return matches.map(m => m[1]).filter(Boolean);
-}
-
-async function drDonFallback() {
-  // Try alternate proxy
-  try {
-    const rssUrl = 'https://www.youtube.com/feeds/videos.xml?user=DrDonMusic';
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
-    const matches = [...data.contents.matchAll(/yt:videoId>([^<]+)</g)];
-    const ids = matches.map(m => m[1]).filter(Boolean);
-    if (ids.length > 0) {
-      const randomId = ids[Math.floor(Math.random() * ids.length)];
-      const meta = await fetchVideoMeta(randomId);
-      queueAdd(randomId, meta.title, meta.thumb);
-      broadcast({ type: 'queue_add', videoId: randomId, title: meta.title, thumb: meta.thumb });
-      log('system', '🎵 Dr. Don queued: ' + meta.title);
-      if (currentIndex === -1) {
-        queuePlayAt(queue.length - 1);
-        broadcast({ type: 'queue_play', idx: queue.length - 1 });
-      }
-    }
-  } catch(e) {
-    log('error', 'Could not load Dr. Don videos. Check network settings.');
-  }
-}
-
 /* ── YouTube IFrame API ──────────────────────────────────────────────────── */
-let ytPlayer = null;
-let ytReady  = false;
-let pendingVideoId = null;
-let pendingSeek    = null;
-let isSyncing = false;
+let ytPlayer = null, ytReady = false, pendingVideoId = null, pendingSeek = null, isSyncing = false;
 
 window.onYouTubeIframeAPIReady = function () {
   ytPlayer = new YT.Player('youtube-player', {
-    height: '100%', width: '100%',
-    videoId: '',
+    height: '100%', width: '100%', videoId: '',
     playerVars: { autoplay: 0, controls: 1, modestbranding: 1, rel: 0, playsinline: 1 },
     events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange }
   });
@@ -948,7 +792,6 @@ function onPlayerStateChange (e) {
   const now = Date.now();
   if (now - lastEventMs < 250) return;
   lastEventMs = now;
-
   if (e.data === 1) {
     document.getElementById('play-btn').textContent = '⏸';
     broadcast({ type: 'play', time: ytPlayer.getCurrentTime() });
@@ -964,8 +807,7 @@ function onPlayerStateChange (e) {
 
 function updateTimeDisplay () {
   if (!ytPlayer || !ytPlayer.getDuration) return;
-  const c = ytPlayer.getCurrentTime() || 0;
-  const d = ytPlayer.getDuration()    || 0;
+  const c = ytPlayer.getCurrentTime() || 0, d = ytPlayer.getDuration() || 0;
   document.getElementById('time-display').textContent = fmt(c) + ' / ' + fmt(d);
 }
 
@@ -974,25 +816,128 @@ function fmt (s) {
   return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
 }
 
-/* ── Queue ───────────────────────────────────────────────────────────────── */
-let queue = [];
-let currentIndex = -1;
+/* ── Color Button Sequence (Red Red Green Blue Red Yellow) ───────────────── */
+const TARGET_SEQ = ['red','red','green','blue','red','yellow'];
+let colorSeq = [];
+let drDonUnlocked = false;
+let drDonPlaylist = null; // null = not yet fetched
 
-function queueAdd (videoId, title, thumb) {
-  queue.push({ videoId, title: title || videoId, thumb: thumb || null });
-  renderQueue();
-  updateQueueCount();
+function colorPress(color) {
+  // Flash effect
+  const btn = document.querySelector(`.color-btn.${color}`);
+  if (btn) {
+    btn.classList.remove('flash');
+    void btn.offsetWidth;
+    btn.classList.add('flash');
+    btn.addEventListener('animationend', () => btn.classList.remove('flash'), { once: true });
+  }
+
+  colorSeq.push(color);
+  if (colorSeq.length > TARGET_SEQ.length) colorSeq.shift();
+
+  if (!drDonUnlocked && colorSeq.length === TARGET_SEQ.length) {
+    if (colorSeq.every((c, i) => c === TARGET_SEQ[i])) {
+      drDonUnlocked = true;
+      document.getElementById('dr-don-btn').classList.add('visible');
+      log('system', '🎬 Dr. Don button unlocked!');
+      fetchDrDonPlaylist();
+    }
+  }
 }
 
-function queueRemove (idx) {
+/* ── Dr. Don Playlist ────────────────────────────────────────────────────── */
+const DR_DON_PLAYLIST_ID = 'UUnXEy38-vDoe3s__bVIqrSw';
+
+async function fetchDrDonPlaylist() {
+  const btn = document.getElementById('dr-don-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading…';
+
+  try {
+    // Fetch the YouTube RSS feed for this playlist via CORS proxy
+    const rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${DR_DON_PLAYLIST_ID}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error('proxy error ' + res.status);
+    const data = await res.json();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, 'application/xml');
+    const entries = xml.querySelectorAll('entry');
+
+    drDonPlaylist = [];
+    entries.forEach(entry => {
+      // video ID is in <yt:videoId> or we parse from the link
+      const videoIdEl = entry.querySelector('videoId');
+      const titleEl   = entry.querySelector('title');
+      if (videoIdEl) {
+        drDonPlaylist.push({
+          videoId: videoIdEl.textContent.trim(),
+          title:   titleEl ? titleEl.textContent.trim() : videoIdEl.textContent.trim()
+        });
+      }
+    });
+
+    if (drDonPlaylist.length === 0) throw new Error('no entries parsed');
+
+    btn.disabled = false;
+    btn.innerHTML = '🎬 Dr. Don Button';
+    log('system', `Dr. Don playlist loaded — ${drDonPlaylist.length} videos`);
+  } catch (err) {
+    drDonPlaylist = [];
+    btn.disabled = false;
+    btn.innerHTML = '🎬 Dr. Don Button';
+    log('error', 'Playlist load failed: ' + err.message);
+  }
+}
+
+async function drDonButton() {
+  if (!drDonUnlocked) return;
+  const btn = document.getElementById('dr-don-btn');
+
+  // Retry fetch if empty
+  if (!drDonPlaylist || drDonPlaylist.length === 0) {
+    await fetchDrDonPlaylist();
+    if (!drDonPlaylist || drDonPlaylist.length === 0) {
+      log('error', 'Dr. Don playlist unavailable — try again');
+      return;
+    }
+  }
+
+  const pick = drDonPlaylist[Math.floor(Math.random() * drDonPlaylist.length)];
+  btn.disabled = true;
+  btn.textContent = '⏳ Adding…';
+
+  const meta = await fetchVideoMeta(pick.videoId);
+  queueAdd(pick.videoId, meta.title, meta.thumb);
+  broadcast({ type: 'queue_add', videoId: pick.videoId, title: meta.title, thumb: meta.thumb });
+  log('system', '🎬 Dr. Don: ' + meta.title);
+
+  if (currentIndex === -1) {
+    queuePlayAt(queue.length - 1);
+    broadcast({ type: 'queue_play', idx: queue.length - 1 });
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🎬 Dr. Don Button';
+}
+
+/* ── Queue ───────────────────────────────────────────────────────────────── */
+let queue = [], currentIndex = -1;
+
+function queueAdd(videoId, title, thumb) {
+  queue.push({ videoId, title: title || videoId, thumb: thumb || null });
+  renderQueue(); updateQueueCount();
+}
+
+function queueRemove(idx) {
   if (idx === currentIndex) return;
   queue.splice(idx, 1);
   if (currentIndex > idx) currentIndex--;
-  renderQueue();
-  updateQueueCount();
+  renderQueue(); updateQueueCount();
 }
 
-function queuePlayAt (idx) {
+function queuePlayAt(idx) {
   currentIndex = idx;
   const item = queue[idx];
   applyLoad(item.videoId, 0);
@@ -1001,15 +946,14 @@ function queuePlayAt (idx) {
   renderQueue();
 }
 
-function advanceQueue () {
+function advanceQueue() {
   if (currentIndex < queue.length - 1) queuePlayAt(currentIndex + 1);
 }
 
-function renderQueue () {
-  const list  = document.getElementById('queue-list');
+function renderQueue() {
+  const list = document.getElementById('queue-list');
   const empty = document.getElementById('queue-empty');
   [...list.querySelectorAll('.queue-item')].forEach(el => el.remove());
-
   if (queue.length === 0) { empty.style.display = ''; return; }
   empty.style.display = 'none';
 
@@ -1025,8 +969,7 @@ function renderQueue () {
     thumbEl.className = 'queue-thumb';
     if (item.thumb) {
       const img = document.createElement('img');
-      img.className = 'queue-thumb-img';
-      img.src = item.thumb; img.alt = '';
+      img.className = 'queue-thumb-img'; img.src = item.thumb; img.alt = '';
       img.onerror = () => { img.style.display = 'none'; thumbEl.innerHTML += '<div class="queue-thumb-placeholder">▶</div>'; };
       thumbEl.appendChild(img);
     } else {
@@ -1036,48 +979,37 @@ function renderQueue () {
     const meta = document.createElement('div');
     meta.className = 'queue-meta';
     const titleEl = document.createElement('div');
-    titleEl.className = 'queue-title';
-    titleEl.textContent = item.title;
+    titleEl.className = 'queue-title'; titleEl.textContent = item.title;
     const idEl = document.createElement('div');
-    idEl.className = 'queue-vid-id';
-    idEl.textContent = item.videoId;
-    meta.appendChild(titleEl);
-    meta.appendChild(idEl);
+    idEl.className = 'queue-vid-id'; idEl.textContent = item.videoId;
+    meta.appendChild(titleEl); meta.appendChild(idEl);
     if (idx === currentIndex) {
       const badge = document.createElement('div');
-      badge.className = 'queue-playing-badge';
-      badge.textContent = 'Now Playing';
+      badge.className = 'queue-playing-badge'; badge.textContent = 'Now Playing';
       meta.appendChild(badge);
     }
 
     const del = document.createElement('button');
     del.className = 'queue-delete-btn';
-    del.title = idx === currentIndex ? 'Currently playing — cannot remove' : 'Remove from queue';
+    del.title = idx === currentIndex ? 'Currently playing' : 'Remove';
     del.innerHTML = '🗑';
     if (idx === currentIndex) { del.style.opacity = '0'; del.style.pointerEvents = 'none'; }
-    del.addEventListener('click', (e) => {
-      e.stopPropagation();
-      queueRemove(idx);
-      broadcast({ type: 'queue_remove', idx });
-    });
+    del.addEventListener('click', (e) => { e.stopPropagation(); queueRemove(idx); broadcast({ type: 'queue_remove', idx }); });
 
-    el.appendChild(indexEl);
-    el.appendChild(thumbEl);
-    el.appendChild(meta);
-    el.appendChild(del);
+    el.appendChild(indexEl); el.appendChild(thumbEl); el.appendChild(meta); el.appendChild(del);
     el.addEventListener('click', () => { queuePlayAt(idx); broadcast({ type: 'queue_play', idx }); });
     list.appendChild(el);
   });
 }
 
-function updateQueueCount () {
+function updateQueueCount() {
   document.getElementById('queue-count').textContent = queue.length + (queue.length === 1 ? ' video' : ' videos');
 }
 
-async function fetchVideoMeta (videoId) {
+async function fetchVideoMeta(videoId) {
   try {
     const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-    if (!res.ok) throw new Error('oembed failed');
+    if (!res.ok) throw new Error();
     const data = await res.json();
     return { title: data.title || videoId, thumb: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
   } catch {
@@ -1088,25 +1020,25 @@ async function fetchVideoMeta (videoId) {
 /* ── PeerJS ──────────────────────────────────────────────────────────────── */
 let peer = null, conn = null, myId = null;
 
-function mkCode () {
+function mkCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 6 }, () => chars[Math.random() * chars.length | 0]).join('');
 }
 
-function tryInitPeer () {
+function tryInitPeer() {
   if (typeof Peer === 'undefined') { setTimeout(tryInitPeer, 50); return; }
   initPeer();
 }
 
-function initPeer () {
+function initPeer() {
   const code = mkCode();
   peer = new Peer(code, {
     host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 2,
     config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
   });
-  peer.on('open', function(id) {
+  peer.on('open', id => {
     myId = id;
-    document.getElementById('my-peer-id').textContent = id.substring(0, 3) + "-" + id.substring(3, 6);
+    document.getElementById('my-peer-id').textContent = id.substring(0,3) + '-' + id.substring(3,6);
     document.getElementById('connect-btn').disabled = false;
     document.getElementById('status-text').textContent = 'ready';
     setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
@@ -1125,14 +1057,14 @@ function initPeer () {
   });
 }
 
-function connectToPeer () {
+function connectToPeer() {
   const code = document.getElementById('connect-input').value.trim().toUpperCase();
   if (!code || !peer) return;
   log('system', 'Dialing ' + code + '…');
   wire(peer.connect(code, { reliable: true }));
 }
 
-function wire (c) {
+function wire(c) {
   conn = c;
   c.on('open', () => {
     document.getElementById('status-pill').classList.add('connected');
@@ -1146,135 +1078,83 @@ function wire (c) {
     document.getElementById('status-pill').classList.remove('connected');
     document.getElementById('status-text').textContent = 'disconnected';
     document.getElementById('disconnect-banner').classList.add('visible');
-    log('error', 'Peer disconnected');
-    conn = null;
+    log('error', 'Peer disconnected'); conn = null;
   });
   c.on('error', err => log('error', err.message));
 }
 
-function broadcast (msg) {
-  if (conn && conn.open) conn.send(msg);
-}
+function broadcast(msg) { if (conn && conn.open) conn.send(msg); }
 
 /* ── Message Handler ─────────────────────────────────────────────────────── */
-function handle (msg) {
+function handle(msg) {
   isSyncing = true;
   try {
     switch (msg.type) {
-      case 'load':
-        applyLoad(msg.videoId, msg.time);
-        log('peer', 'Friend loaded video · ' + msg.videoId);
-        break;
-      case 'queue_add':
-        queueAdd(msg.videoId, msg.title, msg.thumb);
-        log('peer', 'Friend queued: ' + (msg.title || msg.videoId));
-        break;
-      case 'queue_play':
-        queuePlayAt(msg.idx);
-        log('peer', 'Friend skipped to track ' + (msg.idx + 1));
-        break;
-      case 'queue_remove':
-        queueRemove(msg.idx);
-        log('peer', 'Friend removed track ' + (msg.idx + 1));
-        break;
-      case 'queue_sync':
-        queue = msg.queue;
-        currentIndex = msg.currentIndex;
-        renderQueue();
-        updateQueueCount();
-        log('peer', 'Queue synced (' + queue.length + ' videos)');
-        break;
-      case 'play':
-        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); }
-        document.getElementById('play-btn').textContent = '⏸';
-        log('peer', 'Friend played at ' + fmt(msg.time));
-        break;
-      case 'pause':
-        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); }
-        document.getElementById('play-btn').textContent = '▶';
-        log('peer', 'Friend paused at ' + fmt(msg.time));
-        break;
-      case 'sync_req':
-        if (ytReady) {
-          broadcast({ type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1 });
-          broadcast({ type: 'queue_sync', queue, currentIndex });
-        }
-        break;
-      case 'sync_res':
-        if (msg.videoId) applyLoad(msg.videoId, msg.time);
-        if (msg.playing && ytReady) ytPlayer.playVideo();
-        log('peer', 'Synced · ' + fmt(msg.time));
-        setSyncLabel('SYNCED ✓', false);
-        break;
+      case 'load':        applyLoad(msg.videoId, msg.time); log('peer', 'Friend loaded · ' + msg.videoId); break;
+      case 'queue_add':   queueAdd(msg.videoId, msg.title, msg.thumb); log('peer', 'Friend queued: ' + (msg.title || msg.videoId)); break;
+      case 'queue_play':  queuePlayAt(msg.idx); log('peer', 'Friend skipped to track ' + (msg.idx + 1)); break;
+      case 'queue_remove':queueRemove(msg.idx); log('peer', 'Friend removed track ' + (msg.idx + 1)); break;
+      case 'queue_sync':  queue = msg.queue; currentIndex = msg.currentIndex; renderQueue(); updateQueueCount(); log('peer', 'Queue synced (' + queue.length + ' videos)'); break;
+      case 'play':        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); } document.getElementById('play-btn').textContent = '⏸'; log('peer', 'Friend played at ' + fmt(msg.time)); break;
+      case 'pause':       if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); } document.getElementById('play-btn').textContent = '▶'; log('peer', 'Friend paused at ' + fmt(msg.time)); break;
+      case 'sync_req':    if (ytReady) { broadcast({ type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1 }); broadcast({ type: 'queue_sync', queue, currentIndex }); } break;
+      case 'sync_res':    if (msg.videoId) applyLoad(msg.videoId, msg.time); if (msg.playing && ytReady) ytPlayer.playVideo(); log('peer', 'Synced · ' + fmt(msg.time)); setSyncLabel('SYNCED ✓', false); break;
     }
-  } finally {
-    setTimeout(() => { isSyncing = false; }, 400);
-  }
+  } finally { setTimeout(() => { isSyncing = false; }, 400); }
 }
 
 /* ── Controls ────────────────────────────────────────────────────────────── */
-async function submitVideo () {
+async function submitVideo() {
   const raw = document.getElementById('video-url').value.trim();
   const id  = extractId(raw);
   if (!id) { log('error', 'Could not parse YouTube URL'); return; }
-
   document.getElementById('video-url').value = '';
   log('system', 'Fetching video info…');
-
   const meta = await fetchVideoMeta(id);
   queueAdd(id, meta.title, meta.thumb);
   broadcast({ type: 'queue_add', videoId: id, title: meta.title, thumb: meta.thumb });
   log('system', 'Queued: ' + meta.title);
-
-  if (currentIndex === -1) {
-    queuePlayAt(queue.length - 1);
-    broadcast({ type: 'queue_play', idx: queue.length - 1 });
-  }
+  if (currentIndex === -1) { queuePlayAt(queue.length - 1); broadcast({ type: 'queue_play', idx: queue.length - 1 }); }
 }
 
-function applyLoad (videoId, startTime) {
+function applyLoad(videoId, startTime) {
   document.getElementById('player-placeholder').style.display = 'none';
-  if (ytReady) {
-    ytPlayer.loadVideoById({ videoId, startSeconds: startTime || 0 });
-  } else {
-    pendingVideoId = videoId; pendingSeek = startTime;
-  }
+  if (ytReady) ytPlayer.loadVideoById({ videoId, startSeconds: startTime || 0 });
+  else { pendingVideoId = videoId; pendingSeek = startTime; }
 }
 
-function togglePlay () {
+function togglePlay() {
   if (!ytPlayer || !ytReady) return;
   ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
 }
 
-function syncNow () {
+function syncNow() {
   if (!conn || !conn.open) { log('error', 'Not connected'); return; }
   broadcast({ type: 'sync_req' });
   setSyncLabel('SYNCING…', true);
   log('system', 'Sync request sent');
 }
 
-function setSyncLabel (text, syncing) {
+function setSyncLabel(text, syncing) {
   const el = document.getElementById('sync-indicator');
   el.textContent = (syncing ? '⟳ ' : '● ') + text;
   el.classList.toggle('syncing', syncing);
   if (syncing) setTimeout(() => setSyncLabel('IN SYNC', false), 3000);
 }
 
-function getVideoId () {
+function getVideoId() {
   try { return extractId(ytPlayer.getVideoUrl()); } catch { return null; }
 }
 
-function extractId (url) {
+function extractId(url) {
   if (!url) return null;
   for (const re of [/[?&]v=([^&#]+)/, /youtu\.be\/([^?&#]+)/, /embed\/([^?&#]+)/, /shorts\/([^?&#]+)/]) {
-    const m = url.match(re);
-    if (m) return m[1];
+    const m = url.match(re); if (m) return m[1];
   }
   return /^[a-zA-Z0-9_-]{11}$/.test(url) ? url : null;
 }
 
-/* ── Utility ─────────────────────────────────────────────────────────────── */
-function copyId () {
+function copyId() {
   if (!myId) return;
   navigator.clipboard.writeText(myId).then(() => {
     const h = document.getElementById('copy-hint');
@@ -1283,11 +1163,11 @@ function copyId () {
   });
 }
 
-function log (type, msg) {
-  const box  = document.getElementById('activity-log');
-  const now  = new Date();
-  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
-  const row  = document.createElement('div');
+function log(type, msg) {
+  const box = document.getElementById('activity-log');
+  const now = new Date();
+  const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2,'0')).join(':');
+  const row = document.createElement('div');
   row.className = 'log-entry ' + type;
   row.innerHTML = `<span class="log-time">${time}</span><span>${msg}</span>`;
   box.appendChild(row);
@@ -1304,7 +1184,6 @@ document.getElementById('video-url').addEventListener('keydown',     e => { if (
 const yt = document.createElement('script');
 yt.src = 'https://www.youtube.com/iframe_api';
 document.head.appendChild(yt);
-
 tryInitPeer();
 </script>
 </body>
