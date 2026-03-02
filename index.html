@@ -20,11 +20,6 @@
     --green: #47ff8a;
   }
 
-  :root.connected {
-    --accent: #47ff57;
-    --accent2: #4757ff;
-  }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -181,11 +176,145 @@
 
   main { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
 
-  #connect-panel {
+  /* ── Lobby (pre-party) ── */
+  #lobby-panel {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     margin-bottom: 48px;
+  }
+
+  /* ── Party Code Banner ── */
+  #party-banner {
+    display: none;
+    margin-bottom: 32px;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #party-banner.visible { display: block; }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .party-card {
+    background: var(--surface);
+    border: 1px solid rgba(232,255,71,0.3);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .party-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(232,255,71,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .party-card-left { flex: 1; }
+
+  .party-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .party-code-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 10px;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(232,255,71,0.35);
+    line-height: 1;
+    cursor: pointer;
+    transition: text-shadow 0.2s;
+    user-select: all;
+  }
+
+  .party-code-display:hover { text-shadow: 0 0 60px rgba(232,255,71,0.6); }
+
+  .party-code-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .party-code-sub.copied { color: var(--green); }
+
+  .party-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .party-peers-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .party-peers-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .party-peers-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 3px;
+    color: var(--green);
+    line-height: 1;
+  }
+
+  .party-peers-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .peer-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    background: rgba(71,255,138,0.1);
+    border: 1px solid rgba(71,255,138,0.25);
+    color: var(--green);
+    animation: chipIn 0.2s ease;
+  }
+
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .peer-chip.me {
+    background: rgba(232,255,71,0.1);
+    border-color: rgba(232,255,71,0.25);
+    color: var(--accent);
   }
 
   .panel {
@@ -660,9 +789,37 @@
 
   .disconnect-banner.visible { display: flex; }
 
+  /* ── Role Badge ── */
+  .role-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 100px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .role-badge.host {
+    background: rgba(232,255,71,0.12);
+    border: 1px solid rgba(232,255,71,0.3);
+    color: var(--accent);
+  }
+
+  .role-badge.guest {
+    background: rgba(71,255,138,0.1);
+    border: 1px solid rgba(71,255,138,0.25);
+    color: var(--green);
+  }
+
   @media (max-width: 640px) {
-    #connect-panel { grid-template-columns: 1fr; }
+    #lobby-panel { grid-template-columns: 1fr; }
     .peer-id-display { font-size: 32px; letter-spacing: 3px; }
+    .party-code-display { font-size: 44px; letter-spacing: 6px; }
+    .party-card { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .party-card-right { align-items: flex-start; }
     main { padding: 24px 16px; }
     header { padding: 16px; }
     .url-submit-row { flex-direction: column; }
@@ -701,10 +858,11 @@
 
 <main>
   <div id="disconnect-banner" class="disconnect-banner">
-    ⚠ Peer disconnected. Reload the page to start a new session.
+    ⚠ Host disconnected. Reload the page to start a new session.
   </div>
 
-  <div id="connect-panel">
+  <!-- LOBBY: shown until party is formed -->
+  <div id="lobby-panel">
     <div class="panel">
       <div class="panel-label">// Your connection code</div>
       <div class="peer-id-display" id="my-peer-id" onclick="copyId()" title="Click to copy">·····</div>
@@ -714,10 +872,31 @@
     <div class="panel">
       <div class="panel-label">// Connect to friend</div>
       <div class="connect-form">
-        <input type="text" id="connect-input" placeholder="Enter their code..." maxlength="20" />
+        <input type="text" id="connect-input" placeholder="Enter their code or party code..." maxlength="20" />
         <button class="btn btn-primary" id="connect-btn" onclick="connectToPeer()" disabled>
           CONNECT →
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTY BANNER: shown once party is live -->
+  <div id="party-banner">
+    <div class="party-card">
+      <div class="party-card-left">
+        <div class="party-card-label">// Party code — share this with everyone</div>
+        <div class="party-code-display" id="party-code-display" onclick="copyPartyCode()" title="Click to copy">──────</div>
+        <div class="party-code-sub" id="party-code-copy-hint">
+          <span>click to copy &nbsp;·&nbsp;</span>
+          <span id="my-role-badge"></span>
+        </div>
+      </div>
+      <div class="party-card-right">
+        <div class="party-peers-display">
+          <div class="party-peers-label">// Watching</div>
+          <div class="party-peers-count" id="party-peers-count">1</div>
+        </div>
+        <div class="party-peers-list" id="party-peers-list"></div>
       </div>
     </div>
   </div>
@@ -743,7 +922,7 @@
 
     <div class="controls-bar">
       <button class="ctrl-btn" id="play-btn" onclick="togglePlay()" title="Play / Pause">▶</button>
-      <button class="ctrl-btn" onclick="syncNow()" title="Request sync from peer" style="font-size:14px;letter-spacing:-1px">SYNC</button>
+      <button class="ctrl-btn" onclick="syncNow()" title="Request sync from host" style="font-size:14px;letter-spacing:-1px">SYNC</button>
       <div class="time-display" id="time-display">0:00 / 0:00</div>
     </div>
 
@@ -765,6 +944,26 @@
 </main>
 
 <script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   PARTY MODE ARCHITECTURE
+   ─────────────────────────────────────────────────────────────────────────
+   • HOST: The first user to pair with someone. Their PeerJS ID becomes
+     the PARTY CODE. They maintain a direct connection to every guest.
+     They relay all messages to all other peers.
+
+   • GUEST: Anyone who joins via the party code (host's peer ID).
+     Guests connect only to the host; the host relays their messages.
+
+   • LOBBY: Before a party exists, both users see peer codes. When two
+     people connect, the first person to accept becomes HOST, the other
+     becomes the first GUEST. The lobby hides and the party banner appears.
+
+   Flow for a new joiner entering the party code:
+     1. Connect to host (party code = host peer ID)
+     2. Host sends `welcome` with full state (queue, current video, etc.)
+     3. Joiner is now in the party.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 /* ── YouTube IFrame API ──────────────────────────────────────────────────── */
 let ytPlayer = null, ytReady = false, pendingVideoId = null, pendingSeek = null, isSyncing = false;
 
@@ -794,11 +993,11 @@ function onPlayerStateChange (e) {
   lastEventMs = now;
   if (e.data === 1) {
     document.getElementById('play-btn').textContent = '⏸';
-    broadcast({ type: 'play', time: ytPlayer.getCurrentTime() });
+    broadcastAll({ type: 'play', time: ytPlayer.getCurrentTime() });
     log('system', 'You played at ' + fmt(ytPlayer.getCurrentTime()));
   } else if (e.data === 2) {
     document.getElementById('play-btn').textContent = '▶';
-    broadcast({ type: 'pause', time: ytPlayer.getCurrentTime() });
+    broadcastAll({ type: 'pause', time: ytPlayer.getCurrentTime() });
     log('system', 'You paused at ' + fmt(ytPlayer.getCurrentTime()));
   } else if (e.data === 0) {
     advanceQueue();
@@ -816,110 +1015,334 @@ function fmt (s) {
   return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
 }
 
-/* ── Color Button Sequence (Red Red Green Blue Red Yellow) ───────────────── */
-const TARGET_SEQ = ['red','red','green','blue','red','yellow'];
-let colorSeq = [];
-let drDonUnlocked = false;
-let drDonPlaylist = null; // null = not yet fetched
+/* ── Party State ─────────────────────────────────────────────────────────── */
+let isHost   = false;   // am I the hub?
+let partyCode = null;   // = host peer ID, shown to everyone
+let myNickname = null;  // short ID shown in peers list
 
-function colorPress(color) {
-  // Flash effect
-  const btn = document.querySelector(`.color-btn.${color}`);
-  if (btn) {
-    btn.classList.remove('flash');
-    void btn.offsetWidth;
-    btn.classList.add('flash');
-    btn.addEventListener('animationend', () => btn.classList.remove('flash'), { once: true });
-  }
+// Map of peerId → PeerJS DataConnection (host only)
+const guestConns = new Map();
 
-  colorSeq.push(color);
-  if (colorSeq.length > TARGET_SEQ.length) colorSeq.shift();
+// Single connection to host (guest only)
+let hostConn = null;
 
-  if (!drDonUnlocked && colorSeq.length === TARGET_SEQ.length) {
-    if (colorSeq.every((c, i) => c === TARGET_SEQ[i])) {
-      drDonUnlocked = true;
-      document.getElementById('dr-don-btn').classList.add('visible');
-      log('system', '🎬 Dr. Don button unlocked!');
-      fetchDrDonPlaylist();
-    }
-  }
+/* ── PeerJS ──────────────────────────────────────────────────────────────── */
+let peer = null, myId = null;
+
+function mkCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 6 }, () => chars[Math.random() * chars.length | 0]).join('');
 }
 
-/* ── Dr. Don Playlist ────────────────────────────────────────────────────── */
-const DR_DON_PLAYLIST_ID = 'UUnXEy38-vDoe3s__bVIqrSw';
+function tryInitPeer() {
+  if (typeof Peer === 'undefined') { setTimeout(tryInitPeer, 50); return; }
+  initPeer();
+}
 
-async function fetchDrDonPlaylist() {
-  const btn = document.getElementById('dr-don-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Loading…';
+function initPeer() {
+  const code = mkCode();
+  peer = new Peer(code, {
+    host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 1,
+    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
+  });
 
-  try {
-    // Fetch the YouTube RSS feed for this playlist via CORS proxy
-    const rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${DR_DON_PLAYLIST_ID}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-    const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error('proxy error ' + res.status);
-    const data = await res.json();
+  peer.on('open', id => {
+    myId = id;
+    myNickname = id.substring(0, 6);
+    document.getElementById('my-peer-id').textContent = id.substring(0,3) + '-' + id.substring(3,6);
+    document.getElementById('connect-btn').disabled = false;
+    document.getElementById('status-text').textContent = 'ready';
+    setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
+    log('system', 'Your code: ' + id);
+  });
 
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(data.contents, 'application/xml');
-    const entries = xml.querySelectorAll('entry');
+  // Incoming connections — only the host handles these after party is formed
+  peer.on('connection', incoming => {
+    if (!partyCode) {
+      // FIRST incoming connection ever: we become the host
+      becomeHost(incoming);
+    } else if (isHost) {
+      // We're already host, welcome the new guest
+      welcomeGuest(incoming);
+    } else {
+      // We're a guest; stray connection, ignore
+      incoming.close();
+    }
+  });
 
-    drDonPlaylist = [];
-    entries.forEach(entry => {
-      // video ID is in <yt:videoId> or we parse from the link
-      const videoIdEl = entry.querySelector('videoId');
-      const titleEl   = entry.querySelector('title');
-      if (videoIdEl) {
-        drDonPlaylist.push({
-          videoId: videoIdEl.textContent.trim(),
-          title:   titleEl ? titleEl.textContent.trim() : videoIdEl.textContent.trim()
-        });
-      }
+  peer.on('error', err => {
+    if (err.type === 'unavailable-id') { peer.destroy(); initPeer(); return; }
+    log('error', 'Error: ' + err.message);
+    setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 800);
+  });
+
+  peer.on('disconnected', () => {
+    log('error', 'Server connection lost. Reconnecting…');
+    for (let i = 0; i < 20; i++) setTimeout(() => peer.reconnect(), i * 1000);
+  });
+}
+
+/* ── Lobby: initiate connection ──────────────────────────────────────────── */
+function connectToPeer() {
+  const raw = document.getElementById('connect-input').value.trim().toUpperCase();
+  // Strip dashes so both "ABC123" and "ABC-123" work
+  const code = raw.replace(/-/g, '');
+  if (!code || !peer) return;
+  log('system', 'Dialing ' + code + '…');
+  const c = peer.connect(code, { reliable: true });
+  wireAsGuest(c);
+}
+
+/* ── Become HOST (first pair) ────────────────────────────────────────────── */
+function becomeHost(firstGuestConn) {
+  isHost = true;
+  partyCode = myId; // our peer ID is the party code
+  log('system', '🎉 Party created! You are the host.');
+  showPartyBanner('HOST');
+  openPlayerSection();
+  welcomeGuest(firstGuestConn);
+}
+
+function welcomeGuest(c) {
+  c.on('open', () => {
+    guestConns.set(c.peer, c);
+    updateStatusConnected();
+    updatePeerChips();
+    log('peer', '+ ' + c.peer.substring(0,6) + ' joined the party');
+
+    // Send full state to new guest
+    c.send({
+      type: 'welcome',
+      partyCode,
+      queue,
+      currentIndex,
+      videoId:  getVideoId(),
+      time:     ytReady ? ytPlayer.getCurrentTime() : 0,
+      playing:  ytReady && ytPlayer.getPlayerState() === 1
     });
+    // Also tell everyone a new person joined
+    broadcastAll({ type: 'peer_joined', peerId: c.peer }, c.peer);
+  });
 
-    if (drDonPlaylist.length === 0) throw new Error('no entries parsed');
+  c.on('data', msg => {
+    // Host receives message from a guest → apply locally + relay to all other guests
+    handleMessage(msg, c.peer);
+    relayToOthers(msg, c.peer);
+  });
 
-    btn.disabled = false;
-    btn.innerHTML = '<img src="Images/Don.png" width="30px">';
-    log('system', `Dr. Don playlist loaded — ${drDonPlaylist.length} videos`);
-  } catch (err) {
-    drDonPlaylist = [];
-    btn.disabled = false;
-    btn.innerHTML = '<img src="Images/Don.png" width="30px">';
-    log('error', 'Playlist load failed: ' + err.message);
+  c.on('close', () => {
+    guestConns.delete(c.peer);
+    updatePeerChips();
+    broadcastAll({ type: 'peer_left', peerId: c.peer });
+    log('error', c.peer.substring(0,6) + ' left the party');
+    if (guestConns.size === 0) updateStatusSolo();
+  });
+
+  c.on('error', err => log('error', err.message));
+}
+
+/* ── Become GUEST ────────────────────────────────────────────────────────── */
+function wireAsGuest(c) {
+  hostConn = c;
+  c.on('open', () => {
+    log('peer', 'Connected to host…');
+  });
+
+  c.on('data', msg => {
+    if (msg.type === 'welcome') {
+      handleWelcome(msg);
+    } else {
+      handleMessage(msg, 'host');
+    }
+  });
+
+  c.on('close', () => {
+    document.getElementById('status-pill').classList.remove('connected');
+    document.getElementById('status-text').textContent = 'host disconnected';
+    document.getElementById('disconnect-banner').classList.add('visible');
+    document.getElementById('disconnect-banner').textContent = '⚠ Host disconnected. Reload to start a new session.';
+    log('error', 'Host disconnected');
+    hostConn = null;
+  });
+
+  c.on('error', err => log('error', err.message));
+}
+
+function handleWelcome(msg) {
+  partyCode = msg.partyCode;
+  isHost = false;
+  queue = msg.queue || [];
+  currentIndex = msg.currentIndex != null ? msg.currentIndex : -1;
+  renderQueue(); updateQueueCount();
+  showPartyBanner('GUEST');
+  openPlayerSection();
+  updateStatusConnected();
+  log('peer', '🎉 Joined the party! Code: ' + partyCode);
+
+  if (msg.videoId) {
+    applyLoad(msg.videoId, msg.time || 0);
+    if (msg.playing) {
+      setTimeout(() => { if (ytReady) ytPlayer.playVideo(); }, 800);
+    }
   }
 }
 
-async function drDonButton() {
-  if (!drDonUnlocked) return;
-  const btn = document.getElementById('dr-don-btn');
+/* ── Broadcast helpers ───────────────────────────────────────────────────── */
+function broadcastAll(msg, excludePeerId) {
+  if (isHost) {
+    guestConns.forEach((c, id) => {
+      if (id !== excludePeerId && c.open) c.send(msg);
+    });
+  } else {
+    if (hostConn && hostConn.open) hostConn.send(msg);
+  }
+}
 
-  // Retry fetch if empty
-  if (!drDonPlaylist || drDonPlaylist.length === 0) {
-    await fetchDrDonPlaylist();
-    if (!drDonPlaylist || drDonPlaylist.length === 0) {
-      log('error', 'Dr. Don playlist unavailable — try again');
-      return;
+function relayToOthers(msg, fromPeerId) {
+  if (!isHost) return;
+  guestConns.forEach((c, id) => {
+    if (id !== fromPeerId && c.open) c.send(msg);
+  });
+}
+
+/* ── Message Handler ─────────────────────────────────────────────────────── */
+function handleMessage(msg, fromId) {
+  isSyncing = true;
+  try {
+    switch (msg.type) {
+      case 'load':
+        applyLoad(msg.videoId, msg.time);
+        log('peer', (fromId||'?').substring(0,6) + ' loaded · ' + msg.videoId);
+        break;
+      case 'queue_add':
+        queueAdd(msg.videoId, msg.title, msg.thumb);
+        log('peer', (fromId||'?').substring(0,6) + ' queued: ' + (msg.title || msg.videoId));
+        break;
+      case 'queue_play':
+        queuePlayAt(msg.idx);
+        log('peer', (fromId||'?').substring(0,6) + ' skipped to track ' + (msg.idx + 1));
+        break;
+      case 'queue_remove':
+        queueRemove(msg.idx);
+        log('peer', (fromId||'?').substring(0,6) + ' removed track ' + (msg.idx + 1));
+        break;
+      case 'queue_sync':
+        queue = msg.queue; currentIndex = msg.currentIndex;
+        renderQueue(); updateQueueCount();
+        break;
+      case 'play':
+        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); }
+        document.getElementById('play-btn').textContent = '⏸';
+        log('peer', (fromId||'?').substring(0,6) + ' played at ' + fmt(msg.time));
+        break;
+      case 'pause':
+        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); }
+        document.getElementById('play-btn').textContent = '▶';
+        log('peer', (fromId||'?').substring(0,6) + ' paused at ' + fmt(msg.time));
+        break;
+      case 'sync_req':
+        if (ytReady) {
+          const res = { type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1, sentAt: msg.sentAt };
+          if (isHost) {
+            // Send directly back to requester
+            const rc = guestConns.get(fromId);
+            if (rc && rc.open) rc.send(res);
+          } else {
+            hostConn && hostConn.open && hostConn.send(res);
+          }
+          broadcastAll({ type: 'queue_sync', queue, currentIndex });
+        }
+        break;
+      case 'sync_res':
+        if (msg.videoId) {
+          const rtt = Date.now() - (msg.sentAt || Date.now());
+          const off = rtt / 2000;
+          const t = msg.time + (msg.playing ? off : 0);
+          applyLoad(msg.videoId, t);
+          if (msg.playing && ytReady) ytPlayer.playVideo();
+          log('peer', `Synced · ${fmt(t)} (latency: ${Math.round(rtt/2)}ms)`);
+        }
+        setSyncLabel('SYNCED ✓', false);
+        break;
+      case 'peer_joined':
+        updatePeerChips();
+        log('peer', '+ ' + (msg.peerId||'').substring(0,6) + ' joined');
+        break;
+      case 'peer_left':
+        updatePeerChips();
+        log('error', (msg.peerId||'').substring(0,6) + ' left');
+        break;
     }
+  } finally {
+    setTimeout(() => { isSyncing = false; }, 400);
+  }
+}
+
+/* ── UI Helpers ──────────────────────────────────────────────────────────── */
+function showPartyBanner(role) {
+  document.getElementById('lobby-panel').style.display = 'none';
+  const banner = document.getElementById('party-banner');
+  banner.classList.add('visible');
+
+  const codeEl = document.getElementById('party-code-display');
+  const display = partyCode.substring(0,3) + '-' + partyCode.substring(3,6);
+  codeEl.textContent = display;
+
+  const roleEl = document.getElementById('my-role-badge');
+  roleEl.innerHTML = `<span class="role-badge ${role.toLowerCase()}">${role === 'HOST' ? '◈ HOST' : '◉ GUEST'}</span>`;
+
+  updatePeerChips();
+}
+
+function updatePeerChips() {
+  const list = document.getElementById('party-peers-list');
+  list.innerHTML = '';
+  let count = 1; // self
+
+  // Self chip
+  const self = document.createElement('div');
+  self.className = 'peer-chip me';
+  self.textContent = myId ? myId.substring(0,6) : 'YOU';
+  list.appendChild(self);
+
+  if (isHost) {
+    guestConns.forEach((c, id) => {
+      count++;
+      const chip = document.createElement('div');
+      chip.className = 'peer-chip';
+      chip.textContent = id.substring(0,6);
+      list.appendChild(chip);
+    });
+  } else if (hostConn) {
+    // We know there's at least the host + us; we can't enumerate others
+    count = 2; // minimum: us + host
+    const chip = document.createElement('div');
+    chip.className = 'peer-chip';
+    chip.textContent = partyCode ? partyCode.substring(0,6) : 'HOST';
+    list.appendChild(chip);
   }
 
-  const pick = drDonPlaylist[Math.floor(Math.random() * drDonPlaylist.length)];
-  btn.disabled = true;
-  btn.textContent = '⏳ Adding…';
+  document.getElementById('party-peers-count').textContent = count;
+}
 
-  const meta = await fetchVideoMeta(pick.videoId);
-  queueAdd(pick.videoId, meta.title, meta.thumb);
-  broadcast({ type: 'queue_add', videoId: pick.videoId, title: meta.title, thumb: meta.thumb });
-  log('system', '🎬 Dr. Don: ' + meta.title);
-
-  if (currentIndex === -1) {
-    queuePlayAt(queue.length - 1);
-    broadcast({ type: 'queue_play', idx: queue.length - 1 });
+function updateStatusConnected() {
+  const pill = document.getElementById('status-pill');
+  const txt  = document.getElementById('status-text');
+  pill.classList.add('connected');
+  if (isHost) {
+    txt.textContent = 'hosting · ' + guestConns.size + ' guest' + (guestConns.size !== 1 ? 's' : '');
+  } else {
+    txt.textContent = 'in party';
   }
+}
 
-  btn.disabled = false;
-  btn.innerHTML = '<img src="Images/Don.png" width="30px">';
+function updateStatusSolo() {
+  const txt = document.getElementById('status-text');
+  txt.textContent = 'waiting for guests…';
+}
+
+function openPlayerSection() {
+  document.getElementById('player-section').classList.add('visible');
 }
 
 /* ── Queue ───────────────────────────────────────────────────────────────── */
@@ -941,13 +1364,15 @@ function queuePlayAt(idx) {
   currentIndex = idx;
   const item = queue[idx];
   applyLoad(item.videoId, 0);
-  broadcast({ type: 'load', videoId: item.videoId, time: 0 });
   log('system', 'Playing: ' + item.title);
   renderQueue();
 }
 
 function advanceQueue() {
-  if (currentIndex < queue.length - 1) queuePlayAt(currentIndex + 1);
+  if (currentIndex < queue.length - 1) {
+    queuePlayAt(currentIndex + 1);
+    broadcastAll({ type: 'queue_play', idx: currentIndex });
+  }
 }
 
 function renderQueue() {
@@ -994,10 +1419,17 @@ function renderQueue() {
     del.title = idx === currentIndex ? 'Currently playing' : 'Remove';
     del.innerHTML = '🗑';
     if (idx === currentIndex) { del.style.opacity = '0'; del.style.pointerEvents = 'none'; }
-    del.addEventListener('click', (e) => { e.stopPropagation(); queueRemove(idx); broadcast({ type: 'queue_remove', idx }); });
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      queueRemove(idx);
+      broadcastAll({ type: 'queue_remove', idx });
+    });
 
     el.appendChild(indexEl); el.appendChild(thumbEl); el.appendChild(meta); el.appendChild(del);
-    el.addEventListener('click', () => { queuePlayAt(idx); broadcast({ type: 'queue_play', idx }); });
+    el.addEventListener('click', () => {
+      queuePlayAt(idx);
+      broadcastAll({ type: 'queue_play', idx });
+    });
     list.appendChild(el);
   });
 }
@@ -1017,92 +1449,6 @@ async function fetchVideoMeta(videoId) {
   }
 }
 
-/* ── PeerJS ──────────────────────────────────────────────────────────────── */
-let peer = null, conn = null, myId = null;
-
-function mkCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 6 }, () => chars[Math.random() * chars.length | 0]).join('');
-}
-
-function tryInitPeer() {
-  if (typeof Peer === 'undefined') { setTimeout(tryInitPeer, 50); return; }
-  initPeer();
-}
-
-function initPeer() {
-  const code = mkCode();
-  peer = new Peer(code, {
-    host: '0.peerjs.com', port: 443, path: '/', secure: true, debug: 2,
-    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
-  });
-  peer.on('open', id => {
-    myId = id;
-    document.getElementById('my-peer-id').textContent = id.substring(0,3) + '-' + id.substring(3,6);
-    document.getElementById('connect-btn').disabled = false;
-    document.getElementById('status-text').textContent = 'ready';
-    setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 400);
-    log('system', 'Your code: ' + id);
-  });
-  peer.on('connection', c => { wire(c); log('peer', 'Incoming connection…'); document.documentElement.classList.add('connected'); });
-  peer.on('error', err => {
-    if (err.type === 'unavailable-id') { peer.destroy(); initPeer(); return; }
-    log('error', 'Error: ' + err.message);
-    setTimeout(() => document.getElementById('init-overlay').classList.add('hidden'), 800);
-  });
-  peer.on('disconnected', () => {
-    log('error', 'Connection lost. Attempting to reconnect…');
-    document.documentElement.classList.remove('connected');
-    for (let i = 0; i < 20; i++) setTimeout(() => peer.reconnect(), i * 1000);
-  });
-}
-
-function connectToPeer() {
-  const code = document.getElementById('connect-input').value.trim().toUpperCase();
-  if (!code || !peer) return;
-  log('system', 'Dialing ' + code + '…');
-  wire(peer.connect(code, { reliable: true }));
-}
-
-function wire(c) {
-  conn = c;
-  c.on('open', () => {
-    document.getElementById('status-pill').classList.add('connected');
-    document.getElementById('status-text').textContent = 'connected · ' + c.peer;
-    document.getElementById('player-section').classList.add('visible');
-    log('peer', 'Connected to ' + c.peer);
-    document.documentElement.classList.add('connected');
-  });
-  c.on('data', handle);
-  c.on('close', () => {
-    document.getElementById('status-pill').classList.remove('connected');
-    document.getElementById('status-text').textContent = 'disconnected';
-    document.getElementById('disconnect-banner').classList.add('visible');
-    log('error', 'Peer disconnected'); conn = null;
-  });
-  c.on('error', err => log('error', err.message));
-}
-
-function broadcast(msg) { if (conn && conn.open) conn.send(msg); }
-
-/* ── Message Handler ─────────────────────────────────────────────────────── */
-function handle(msg) {
-  isSyncing = true;
-  try {
-    switch (msg.type) {
-      case 'load':        applyLoad(msg.videoId, msg.time); log('peer', 'Friend loaded · ' + msg.videoId); break;
-      case 'queue_add':   queueAdd(msg.videoId, msg.title, msg.thumb); log('peer', 'Friend queued: ' + (msg.title || msg.videoId)); break;
-      case 'queue_play':  queuePlayAt(msg.idx); log('peer', 'Friend skipped to track ' + (msg.idx + 1)); break;
-      case 'queue_remove':queueRemove(msg.idx); log('peer', 'Friend removed track ' + (msg.idx + 1)); break;
-      case 'queue_sync':  queue = msg.queue; currentIndex = msg.currentIndex; renderQueue(); updateQueueCount(); log('peer', 'Queue synced (' + queue.length + ' videos)'); break;
-      case 'play':        if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.playVideo(); } document.getElementById('play-btn').textContent = '⏸'; log('peer', 'Friend played at ' + fmt(msg.time)); break;
-      case 'pause':       if (ytReady) { ytPlayer.seekTo(msg.time, true); ytPlayer.pauseVideo(); } document.getElementById('play-btn').textContent = '▶'; log('peer', 'Friend paused at ' + fmt(msg.time)); break;
-      case 'sync_req':    if (ytReady) { broadcast({type: 'sync_res', videoId: getVideoId(), time: ytPlayer.getCurrentTime(), playing: ytPlayer.getPlayerState() === 1, sentAt: msg.sentAt}); broadcast({ type: 'queue_sync', queue, currentIndex }); } break;
-      case 'sync_res':    if (msg.videoId) { const rtt = Date.now() - (msg.sentAt || Date.now()); const latencyOffset = rtt / 2000; const adjustedTime = msg.time + (msg.playing ? latencyOffset : 0); applyLoad(msg.videoId, adjustedTime); if (msg.playing && ytReady) ytPlayer.playVideo(); log('peer', `Synced · ${fmt(adjustedTime)} (latency: ${Math.round(rtt/2)}ms)`); } setSyncLabel('SYNCED ✓', false); break;
-    }
-  } finally { setTimeout(() => { isSyncing = false; }, 400); }
-}
-
 /* ── Controls ────────────────────────────────────────────────────────────── */
 async function submitVideo() {
   const raw = document.getElementById('video-url').value.trim();
@@ -1112,9 +1458,12 @@ async function submitVideo() {
   log('system', 'Fetching video info…');
   const meta = await fetchVideoMeta(id);
   queueAdd(id, meta.title, meta.thumb);
-  broadcast({ type: 'queue_add', videoId: id, title: meta.title, thumb: meta.thumb });
+  broadcastAll({ type: 'queue_add', videoId: id, title: meta.title, thumb: meta.thumb });
   log('system', 'Queued: ' + meta.title);
-  if (currentIndex === -1) { queuePlayAt(queue.length - 1); broadcast({ type: 'queue_play', idx: queue.length - 1 }); }
+  if (currentIndex === -1) {
+    queuePlayAt(queue.length - 1);
+    broadcastAll({ type: 'queue_play', idx: queue.length - 1 });
+  }
 }
 
 function applyLoad(videoId, startTime) {
@@ -1129,9 +1478,9 @@ function togglePlay() {
 }
 
 function syncNow() {
-  if (!conn || !conn.open) { log('error', 'Not connected'); return; }
-  conn._syncSentAt = Date.now();
-  broadcast({ type: 'sync_req', sentAt: Date.now() });
+  const connected = isHost ? guestConns.size > 0 : (hostConn && hostConn.open);
+  if (!connected) { log('error', 'Not connected to anyone'); return; }
+  broadcastAll({ type: 'sync_req', sentAt: Date.now() });
   setSyncLabel('SYNCING…', true);
   log('system', 'Sync request sent');
 }
@@ -1164,6 +1513,17 @@ function copyId() {
   });
 }
 
+function copyPartyCode() {
+  if (!partyCode) return;
+  navigator.clipboard.writeText(partyCode).then(() => {
+    const h = document.getElementById('party-code-copy-hint');
+    const orig = h.innerHTML;
+    h.textContent = '✓ copied to clipboard!';
+    h.classList.add('copied');
+    setTimeout(() => { h.innerHTML = orig; h.classList.remove('copied'); }, 2000);
+  });
+}
+
 function log(type, msg) {
   const box = document.getElementById('activity-log');
   const now = new Date();
@@ -1174,6 +1534,87 @@ function log(type, msg) {
   box.appendChild(row);
   box.scrollTop = box.scrollHeight;
   while (box.children.length > 120) box.removeChild(box.firstChild);
+}
+
+/* ── Color Button Sequence (Red Red Green Blue Red Yellow) ───────────────── */
+const TARGET_SEQ = ['red','red','green','blue','red','yellow'];
+let colorSeq = [];
+let drDonUnlocked = false;
+let drDonPlaylist = null;
+
+function colorPress(color) {
+  const btn = document.querySelector(`.color-btn.${color}`);
+  if (btn) {
+    btn.classList.remove('flash');
+    void btn.offsetWidth;
+    btn.classList.add('flash');
+    btn.addEventListener('animationend', () => btn.classList.remove('flash'), { once: true });
+  }
+  colorSeq.push(color);
+  if (colorSeq.length > TARGET_SEQ.length) colorSeq.shift();
+  if (!drDonUnlocked && colorSeq.length === TARGET_SEQ.length) {
+    if (colorSeq.every((c, i) => c === TARGET_SEQ[i])) {
+      drDonUnlocked = true;
+      document.getElementById('dr-don-btn').classList.add('visible');
+      log('system', '🎬 Dr. Don button unlocked!');
+      fetchDrDonPlaylist();
+    }
+  }
+}
+
+const DR_DON_PLAYLIST_ID = 'UUnXEy38-vDoe3s__bVIqrSw';
+
+async function fetchDrDonPlaylist() {
+  const btn = document.getElementById('dr-don-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading…';
+  try {
+    const rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${DR_DON_PLAYLIST_ID}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error('proxy error ' + res.status);
+    const data = await res.json();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, 'application/xml');
+    const entries = xml.querySelectorAll('entry');
+    drDonPlaylist = [];
+    entries.forEach(entry => {
+      const videoIdEl = entry.querySelector('videoId');
+      const titleEl   = entry.querySelector('title');
+      if (videoIdEl) drDonPlaylist.push({ videoId: videoIdEl.textContent.trim(), title: titleEl ? titleEl.textContent.trim() : videoIdEl.textContent.trim() });
+    });
+    if (drDonPlaylist.length === 0) throw new Error('no entries parsed');
+    btn.disabled = false;
+    btn.innerHTML = '<img src="Images/Don.png" width="30px">';
+    log('system', `Dr. Don playlist loaded — ${drDonPlaylist.length} videos`);
+  } catch (err) {
+    drDonPlaylist = [];
+    btn.disabled = false;
+    btn.innerHTML = '<img src="Images/Don.png" width="30px">';
+    log('error', 'Playlist load failed: ' + err.message);
+  }
+}
+
+async function drDonButton() {
+  if (!drDonUnlocked) return;
+  const btn = document.getElementById('dr-don-btn');
+  if (!drDonPlaylist || drDonPlaylist.length === 0) {
+    await fetchDrDonPlaylist();
+    if (!drDonPlaylist || drDonPlaylist.length === 0) { log('error', 'Dr. Don playlist unavailable — try again'); return; }
+  }
+  const pick = drDonPlaylist[Math.floor(Math.random() * drDonPlaylist.length)];
+  btn.disabled = true;
+  btn.textContent = '⏳ Adding…';
+  const meta = await fetchVideoMeta(pick.videoId);
+  queueAdd(pick.videoId, meta.title, meta.thumb);
+  broadcastAll({ type: 'queue_add', videoId: pick.videoId, title: meta.title, thumb: meta.thumb });
+  log('system', '🎬 Dr. Don: ' + meta.title);
+  if (currentIndex === -1) {
+    queuePlayAt(queue.length - 1);
+    broadcastAll({ type: 'queue_play', idx: queue.length - 1 });
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<img src="Images/Don.png" width="30px">';
 }
 
 /* ── Listeners ───────────────────────────────────────────────────────────── */
