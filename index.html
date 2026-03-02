@@ -1403,7 +1403,7 @@ function wireAsGuest(c) {
     document.getElementById('disconnect-banner').classList.add('visible');
     document.getElementById('disconnect-banner').textContent = '⚠ Host disconnected. Reload to start a new session.';
     log('error', 'Host disconnected');
-    doobeep.volume = 0.2;
+    banono.volume = 0.2;
     banono.currentTime = 0;
     banono.play()
       .catch(err => console.log('Audio play failed:', err));
