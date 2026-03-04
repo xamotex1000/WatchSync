@@ -1318,6 +1318,7 @@ function connectToPeer() {
 /* ── Become HOST (first pair) ────────────────────────────────────────────── */
 function becomeHost(firstGuestConn) {
   isHost = true;
+  document.documentElement.classList.add("connected");
   partyCode = myId; // our peer ID is the party code
   log('system', '🎉 Party created! You are the host.');
   showPartyBanner('HOST');
