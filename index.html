@@ -21,17 +21,12 @@
     --text: #f0f0f0;
     --muted: #666;
     --green: #47ff8a;
+    --blue: #478aff;
+    --peer-chip-border: rgba(232,255,71,0.25);
+    --peer-chip-background: rgba(232,255,71,0.1);
   }
   :root.connected {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --surface2: #1a1a1a;
-    --border: #2a2a2a;
-    --accent: #47ff8a;
-    --accent2: #ff4757;
-    --text: #f0f0f0;
-    --muted: #666;
-    --green: #478aff;
+    --accent: #47c28a;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -339,8 +334,8 @@
   }
 
   .peer-chip.me {
-    background: rgba(232,255,71,0.1);
-    border-color: rgba(232,255,71,0.25);
+    background: var(--peer-chip-background);
+    border-color: var(--peer-chip-border);
     color: var(--accent);
   }
 
@@ -501,14 +496,14 @@
 
   .username-set-btn:hover {
     background: rgba(71,255,138,0.14);
-    border-color: var(--green);
+    border-color: var(--blue);
     box-shadow: 0 0 12px rgba(71,255,138,0.2);
   }
 
   .username-confirm {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
-    color: var(--green);
+    color: var(--blue);
     opacity: 0;
     transition: opacity 0.3s;
     white-space: nowrap;
