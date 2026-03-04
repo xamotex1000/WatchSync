@@ -1289,8 +1289,7 @@ function initPeer() {
   });
 
   peer.on('disconnected', () => {
-    log('error', 'Server connection lost. Reconnecting…');
-    for (let i = 0; i < 20; i++) setTimeout(() => peer.reconnect(), i * 1000);
+    log('error', 'Server connection lost');
   });
 }
 
