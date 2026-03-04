@@ -21,9 +21,12 @@
     --text: #f0f0f0;
     --muted: #666;
     --green: #47ff8a;
+    --yellow: #e8ff47;
     --blue: #478aff;
     --peer-chip-border: rgba(232,255,71,0.25);
     --peer-chip-background: rgba(232,255,71,0.1);
+    --peer-chip-border1: 1px solid rgba(71,255,138,0.25);
+    --peer-chip-background1: rgba(71,255,138,0.1);
   }
   :root.connected {
     --accent: #47c28a;
@@ -209,7 +212,7 @@
 
   .party-card {
     background: var(--surface);
-    border: 1px solid rgba(232,255,71,0.3);
+    border: var(--peer-chip-border1);
     border-radius: 16px;
     padding: 32px;
     position: relative;
@@ -322,8 +325,8 @@
     font-size: 10px;
     padding: 3px 8px;
     border-radius: 100px;
-    background: rgba(71,255,138,0.1);
-    border: 1px solid rgba(71,255,138,0.25);
+    background: var(--peer-chip-background1);
+    border: var(--peer-chip-border1);
     color: var(--green);
     animation: chipIn 0.2s ease;
   }
@@ -336,7 +339,7 @@
   .peer-chip.me {
     background: var(--peer-chip-background);
     border-color: var(--peer-chip-border);
-    color: var(--accent);
+    color: var(--yellow);
   }
 
   .panel {
