@@ -27,9 +27,11 @@
     --peer-chip-background: rgba(232,255,71,0.1);
     --peer-chip-border1: 1px solid rgba(71,255,138,0.25);
     --peer-chip-background1: rgba(71,255,138,0.1);
+    --base-border: 1px solid rgba(232,255,71,0.25);
   }
   :root.connected {
     --accent: #47c28a;
+    --base-border: 1px solid rgba(71,255,138,0.25);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -212,7 +214,7 @@
 
   .party-card {
     background: var(--surface);
-    border: var(--peer-chip-border1);
+    border: var(--base-border);
     border-radius: 16px;
     padding: 32px;
     position: relative;
@@ -247,7 +249,7 @@
     font-size: 64px;
     letter-spacing: 10px;
     color: var(--accent);
-    text-shadow: 0 0 40px rgba(232,255,71,0.35);
+    text-shadow: 0 0 40px rgba(71,255,138,0.35);
     line-height: 1;
     cursor: pointer;
     transition: text-shadow 0.2s;
