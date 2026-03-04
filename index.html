@@ -22,6 +22,17 @@
     --muted: #666;
     --green: #47ff8a;
   }
+  :root.connected {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #47ff8a;
+    --accent2: #ff4757;
+    --text: #f0f0f0;
+    --muted: #666;
+    --green: #478aff;
+  }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1383,6 +1394,7 @@ function wireAsGuest(c) {
   c.on('open', () => {
     log('peer', 'Connected to host…');
     // Introduce ourselves with our username
+    document.documentElement.classList.add("connected");
     if (myUsername) {
       c.send({ type: 'username_update', peerId: myId, username: myUsername });
     }
